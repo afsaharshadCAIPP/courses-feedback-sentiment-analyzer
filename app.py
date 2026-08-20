@@ -1,53 +1,171 @@
+%%writefile app.py
 import streamlit as st
 import joblib
 import pandas as pd
 import numpy as np
 import plotly.express as px
+import plotly.graph_objects as go
 from transformers import pipeline
 
 # ==========================================
-# 1. PAGE CONFIG & CUSTOM CSS
+# 1. PAGE CONFIG & ULTRA-PREMIUM DARK THEME
 # ==========================================
 st.set_page_config(
-    page_title="Customer Feedback Sentiment Analyzer",
-    page_icon="💬",
+    page_title="Customer Feedback AI Hub | Afsah Arshad",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 st.markdown("""
 <style>
-    .main-title {
-        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 50%, #6dd5ed 100%);
+    /* Global Background */
+    .stApp {
+        background: radial-gradient(circle at top right, #161b22, #0d1117);
+        color: #c9d1d9;
+        font-family: 'Inter', -apple-system, sans-serif;
+    }
+    
+    /* Hero Header & Developer Badge */
+    .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background: rgba(22, 27, 34, 0.6);
+        border: 1px solid rgba(48, 54, 61, 0.6);
+        border-radius: 16px;
+        backdrop-filter: blur(12px);
+        margin-bottom: 25px;
+    }
+    .hero-title {
+        background: linear-gradient(135deg, #00F2FE 0%, #4FACFE 50%, #7F00FF 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 2.8rem;
-        font-weight: 800;
-        margin-bottom: 0px;
+        font-size: 2.3rem;
+        font-weight: 900;
+        letter-spacing: -0.5px;
+        margin: 0;
     }
-    .sub-title {
-        color: #555;
-        font-size: 1.1rem;
+    .hero-sub {
+        color: #8b949e;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+    .dev-badge {
+        background: linear-gradient(135deg, rgba(0,242,254,0.1), rgba(127,0,255,0.1));
+        border: 1px solid #00F2FE;
+        padding: 8px 18px;
+        border-radius: 30px;
+        text-align: right;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+    }
+    .dev-name {
+        color: #00F2FE;
+        font-weight: 800;
+        font-size: 1.05rem;
+        letter-spacing: 0.5px;
+    }
+
+    /* Glassmorphic Animated Cards */
+    .glass-card {
+        background: rgba(22, 27, 34, 0.75);
+        border: 1px solid rgba(48, 54, 61, 0.8);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease-in-out;
         margin-bottom: 20px;
     }
+    .glass-card:hover {
+        border-color: #00F2FE;
+        box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
+        transform: translateY(-2px);
+    }
+    
+    /* Glowing Sentiment Badges */
     .badge-pos {
-        background-color: #d4edda; color: #155724; padding: 6px 14px; 
-        border-radius: 20px; font-weight: bold; font-size: 1.2rem; display: inline-block;
+        background: rgba(16, 185, 129, 0.15);
+        border: 1px solid #10B981;
+        color: #10B981;
+        padding: 10px 24px;
+        border-radius: 30px;
+        font-weight: 800;
+        font-size: 1.25rem;
+        display: inline-block;
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
     }
     .badge-neg {
-        background-color: #f8d7da; color: #721c24; padding: 6px 14px; 
-        border-radius: 20px; font-weight: bold; font-size: 1.2rem; display: inline-block;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid #EF4444;
+        color: #EF4444;
+        padding: 10px 24px;
+        border-radius: 30px;
+        font-weight: 800;
+        font-size: 1.25rem;
+        display: inline-block;
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
     }
     .badge-neu {
-        background-color: #fff3cd; color: #856404; padding: 6px 14px; 
-        border-radius: 20px; font-weight: bold; font-size: 1.2rem; display: inline-block;
+        background: rgba(245, 158, 11, 0.15);
+        border: 1px solid #F59E0B;
+        color: #F59E0B;
+        padding: 10px 24px;
+        border-radius: 30px;
+        font-weight: 800;
+        font-size: 1.25rem;
+        display: inline-block;
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Styled Inputs & Buttons */
+    .stTextArea textarea {
+        background-color: #161b22 !important;
+        color: #f0f6fc !important;
+        border: 1px solid #30363d !important;
+        border-radius: 12px !important;
+    }
+    .stButton>button {
+        background: linear-gradient(135deg, #00F2FE 0%, #4FACFE 100%) !important;
+        color: #0d1117 !important;
+        border-radius: 12px !important;
+        padding: 12px 28px !important;
+        font-weight: 800 !important;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4) !important;
+        transition: all 0.3s ease !important;
+    }
+    .stButton>button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 242, 254, 0.6) !important;
+    }
+
+    /* Footer */
+    .custom-footer {
+        text-align: center;
+        padding: 20px;
+        color: #8b949e;
+        font-size: 0.85rem;
+        border-top: 1px solid #30363d;
+        margin-top: 40px;
     }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="main-title">💬 Customer Feedback Sentiment Analyzer</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">AI-Powered Multi-Model Sentiment Classification & Explainable AI (XAI) Platform</p>', unsafe_allow_html=True)
-st.markdown("---")
+# Main Header Banner with Name
+st.markdown("""
+<div class="header-container">
+    <div>
+        <p class="hero-title">⚡ Customer Feedback AI Hub</p>
+        <p class="hero-sub">Multi-Engine Sentiment Intelligence & Explainable AI Platform</p>
+    </div>
+    <div class="dev-badge">
+        <span style="font-size: 0.75rem; color: #8b949e; text-transform: uppercase; letter-spacing: 1px;">Designed & Built By</span><br>
+        <span class="dev-name">Afsah Arshad</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # ==========================================
 # 2. MODEL LOADERS
@@ -62,9 +180,8 @@ def load_tfidf():
 @st.cache_resource
 def load_distilbert():
     try:
-        # Use top_k=None to ensure all class scores are returned properly
         return pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english", top_k=None)
-    except Exception as e:
+    except:
         return None
 
 tfidf_model, vectorizer = load_tfidf()
@@ -73,18 +190,24 @@ distilbert_pipe = load_distilbert()
 # ==========================================
 # 3. SIDEBAR CONTROLS
 # ==========================================
-st.sidebar.image("https://cdn-icons-png.flaticon.com/512/2082/2082803.png", width=100)
-st.sidebar.header("⚙️ Model Configuration")
+st.sidebar.markdown("""
+<div style="text-align: center; padding: 10px; background: rgba(0,242,254,0.05); border-radius: 12px; border: 1px solid rgba(0,242,254,0.2); margin-bottom: 20px;">
+    <span style="color: #8b949e; font-size: 0.8rem;">DEVELOPER PROFILE</span><br>
+    <strong style="color: #f0f6fc; font-size: 1.1rem;">Afsah Arshad</strong><br>
+    <span style="color: #00F2FE; font-size: 0.8rem;">AI Practitioner</span>
+</div>
+""", unsafe_allow_html=True)
 
+st.sidebar.markdown("### ⚙️ Engine Settings")
 selected_model = st.sidebar.radio(
-    "Choose Sentiment Engine:",
+    "Select AI Model:",
     ["TF-IDF + Logistic Regression (ML)", "DistilBERT Transformer (Deep Learning)", "Ensemble (Compare Both)"]
 )
 
 st.sidebar.markdown("---")
-st.sidebar.subheader("💡 Sample Test Templates")
+st.sidebar.markdown("### 💡 Quick Test Scenarios")
 sample_choice = st.sidebar.selectbox(
-    "Quick Select Feedback:",
+    "Load Preset Feedback:",
     [
         "Custom Input",
         "The fabric quality is super soft and fits perfectly!",
@@ -94,132 +217,110 @@ sample_choice = st.sidebar.selectbox(
 )
 
 # ==========================================
-# 4. MAIN INTERACTIVE TABS
+# 4. MAIN TABS WORKSPACE
 # ==========================================
 tab1, tab2, tab3, tab4 = st.tabs([
-    "⚡ Live Feedback Analyzer", 
-    "🔍 Explainable AI (SHAP / XAI)", 
+    "🎯 Live Workspace", 
+    "🔍 Explainable AI (XAI)", 
     "📊 Batch CSV Analytics", 
-    "⚔️ Model Benchmarking"
+    "⚔️ Architecture Benchmarks"
 ])
 
-# ------------------------------------------
-# TAB 1: LIVE FEEDBACK ANALYZER
-# ------------------------------------------
+# TAB 1: LIVE WORKSPACE
 with tab1:
     default_text = "" if sample_choice == "Custom Input" else sample_choice
-    user_input = st.text_area("📝 Enter Customer Feedback Text:", value=default_text, height=120)
+    user_input = st.text_area("📝 Enter Customer Feedback:", value=default_text, height=120)
     
-    if st.button("🚀 Analyze Sentiment Now", use_container_width=True):
+    if st.button("🚀 Run Sentiment Intelligence", use_container_width=True):
         if user_input.strip():
             col1, col2 = st.columns([1, 1])
             
-            # TF-IDF Prediction Logic
+            # Predictions Logic
             if "TF-IDF" in selected_model or "Compare" in selected_model:
                 vec = vectorizer.transform([user_input])
-                if vec.nnz == 0:
-                    pred_tfidf = "NEUTRAL"
-                    probs_tfidf = [0.33, 0.34, 0.33]
-                else:
-                    pred_tfidf = tfidf_model.predict(vec)[0]
-                    probs_tfidf = tfidf_model.predict_proba(vec)[0]
+                pred_tfidf = "NEUTRAL" if vec.nnz == 0 else tfidf_model.predict(vec)[0]
+                probs_tfidf = [0.33, 0.34, 0.33] if vec.nnz == 0 else tfidf_model.predict_proba(vec)[0]
 
-            # DistilBERT Safe Parsing Logic
             if "DistilBERT" in selected_model or "Compare" in selected_model:
                 db_raw = distilbert_pipe(user_input)
-                
-                # Robust extraction regardless of list depth
-                if isinstance(db_raw, list) and len(db_raw) > 0:
-                    res_list = db_raw[0] if isinstance(db_raw[0], list) else db_raw
-                else:
-                    res_list = []
-                    
+                res_list = db_raw[0] if isinstance(db_raw, list) and isinstance(db_raw[0], list) else db_raw
                 db_scores = {item['label'].upper(): item['score'] for item in res_list if isinstance(item, dict)}
                 
                 pos_score = db_scores.get('POSITIVE', 0.0)
                 neg_score = db_scores.get('NEGATIVE', 0.0)
                 neu_score = round(max(0.0, 1.0 - (pos_score + neg_score)), 4)
                 
-                if pos_score > neg_score and pos_score > 0.5:
-                    pred_db = "POSITIVE"
-                elif neg_score > pos_score and neg_score > 0.5:
-                    pred_db = "NEGATIVE"
-                else:
-                    pred_db = "NEUTRAL"
-                    
+                pred_db = "POSITIVE" if pos_score > neg_score and pos_score > 0.5 else ("NEGATIVE" if neg_score > pos_score and neg_score > 0.5 else "NEUTRAL")
                 probs_db = [neg_score, neu_score, pos_score]
 
-            # Display Selection
             with col1:
-                st.subheader("🎯 Classification Result")
+                st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+                st.markdown("#### Predicted Classification")
                 final_pred = pred_db if "DistilBERT" in selected_model else pred_tfidf
                 
                 if final_pred == "POSITIVE":
-                    st.markdown('<div class="badge-pos">🟢 POSITIVE FEEDBACK</div>', unsafe_allow_html=True)
+                    st.markdown('<div class="badge-pos">🟢 POSITIVE</div>', unsafe_allow_html=True)
                 elif final_pred == "NEGATIVE":
-                    st.markdown('<div class="badge-neg">🔴 NEGATIVE FEEDBACK</div>', unsafe_allow_html=True)
+                    st.markdown('<div class="badge-neg">🔴 NEGATIVE</div>', unsafe_allow_html=True)
                 else:
-                    st.markdown('<div class="badge-neu">🟡 NEUTRAL FEEDBACK</div>', unsafe_allow_html=True)
+                    st.markdown('<div class="badge-neu">🟡 NEUTRAL</div>', unsafe_allow_html=True)
 
                 st.write("")
-                st.caption(f"Engine Used: **{selected_model}**")
+                st.caption(f"Engine: `{selected_model}`")
+                st.markdown('</div>', unsafe_allow_html=True)
 
             with col2:
-                st.subheader("📊 Confidence Probabilities")
+                st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+                st.markdown("#### Confidence Breakdown")
                 active_probs = probs_db if "DistilBERT" in selected_model else probs_tfidf
                 df_chart = pd.DataFrame({'Sentiment': ['NEGATIVE', 'NEUTRAL', 'POSITIVE'], 'Probability': active_probs})
                 
                 fig = px.bar(
                     df_chart, x='Probability', y='Sentiment', orientation='h',
                     color='Sentiment',
-                    color_discrete_map={'POSITIVE': '#2ca02c', 'NEGATIVE': '#d62728', 'NEUTRAL': '#ff7f0e'},
+                    color_discrete_map={'POSITIVE': '#10B981', 'NEGATIVE': '#EF4444', 'NEUTRAL': '#F59E0B'},
                     text_auto='.1%'
                 )
-                fig.update_layout(height=220, showlegend=False, margin=dict(l=0, r=0, t=30, b=0))
+                fig.update_layout(
+                    template='plotly_dark',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    height=200,
+                    showlegend=False,
+                    margin=dict(l=0, r=0, t=10, b=0)
+                )
                 st.plotly_chart(fig, use_container_width=True)
+                st.markdown('</div>', unsafe_allow_html=True)
 
-# ------------------------------------------
-# TAB 2: EXPLAINABLE AI (SHAP / XAI)
-# ------------------------------------------
+# TAB 2: EXPLAINABLE AI
 with tab2:
-    st.subheader("🔍 Feature Importance & SHAP Word Impact")
-    st.write("Word-level feature weight contributions:")
-    
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.markdown("### 🔍 Word-Level Feature Weight Impact")
     if user_input.strip() and tfidf_model:
         vec = vectorizer.transform([user_input])
-        feature_names = vectorizer.get_feature_names_out()
         words = user_input.lower().split()
-        
         impact_list = []
         for word in words:
             if word in vectorizer.vocabulary_:
                 idx = vectorizer.vocabulary_[word]
-                weight = tfidf_model.coef_[2][idx]
-                impact_list.append((word, weight))
+                impact_list.append((word, tfidf_model.coef_[2][idx]))
             else:
                 impact_list.append((word, 0.0))
                 
         df_impact = pd.DataFrame(impact_list, columns=['Word', 'Impact_Weight'])
-        
-        fig_xai = px.bar(
-            df_impact, x='Word', y='Impact_Weight',
-            color='Impact_Weight',
-            color_continuous_scale='RdYlGn',
-            title="Word-Level Feature Weight Contributions"
-        )
+        fig_xai = px.bar(df_impact, x='Word', y='Impact_Weight', color='Impact_Weight', color_continuous_scale='RdYlGn')
+        fig_xai.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(fig_xai, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-# ------------------------------------------
-# TAB 3: BATCH CSV ANALYTICS
-# ------------------------------------------
+# TAB 3: BATCH ANALYTICS
 with tab3:
-    st.subheader("📁 Bulk Customer Feedback Processing")
-    uploaded_file = st.file_uploader("Upload CSV File:", type=['csv', 'xlsx'])
-    
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.markdown("### 📁 Bulk Feedback Analytics")
+    uploaded_file = st.file_uploader("Upload CSV containing 'Review Text' column:", type=['csv', 'xlsx'])
     if uploaded_file:
         df_batch = pd.read_csv(uploaded_file) if uploaded_file.name.endswith('.csv') else pd.read_excel(uploaded_file)
         if 'Review Text' in df_batch.columns:
-            st.success(f"Loaded {len(df_batch)} rows successfully!")
             vecs = vectorizer.transform(df_batch['Review Text'].fillna(''))
             df_batch['Predicted_Sentiment'] = tfidf_model.predict(vecs)
             
@@ -229,25 +330,29 @@ with tab3:
             m3.metric("Negative %", f"{(df_batch['Predicted_Sentiment']=='NEGATIVE').mean()*100:.1f}%")
             m4.metric("Neutral %", f"{(df_batch['Predicted_Sentiment']=='NEUTRAL').mean()*100:.1f}%")
             
-            fig_donut = px.pie(
-                df_batch, names='Predicted_Sentiment', hole=0.4,
-                color='Predicted_Sentiment',
-                color_discrete_map={'POSITIVE': '#2ca02c', 'NEGATIVE': '#d62728', 'NEUTRAL': '#ff7f0e'},
-                title="Batch Sentiment Breakdown"
-            )
+            fig_donut = px.pie(df_batch, names='Predicted_Sentiment', hole=0.5, color='Predicted_Sentiment',
+                               color_discrete_map={'POSITIVE': '#10B981', 'NEGATIVE': '#EF4444', 'NEUTRAL': '#F59E0B'})
+            fig_donut.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_donut, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-# ------------------------------------------
-# TAB 4: MODEL BENCHMARKING
-# ------------------------------------------
+# TAB 4: ARCHITECTURE BENCHMARKS
 with tab4:
-    st.subheader("⚔️ ML vs Deep Learning Benchmark")
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.markdown("### ⚔️ Model Architecture Comparison")
     st.markdown("""
-    | Evaluation Metric | TF-IDF + Logistic Regression | DistilBERT Transformer |
+    | Metric / Feature | TF-IDF + Logistic Regression | DistilBERT Transformer |
     | :--- | :--- | :--- |
-    | **Architecture** | Classical Linear Model | Pretrained Bidirectional Transformer |
-    | **Accuracy** | ~88.5% | **~92.4%** |
-    | **Inference Latency** | ~5ms | ~80ms |
-    | **Unseen Words (OOV)** | Fallback to Neutral | Subword WordPiece Tokenization |
-    | **XAI Capabilities** | Coefficient Extraction | Attention / SHAP Maps |
+    | **Architecture** | Linear Feature Matrix | Deep Bidirectional Transformer |
+    | **Benchmark Accuracy** | ~88.5% | **~92.4%** |
+    | **Inference Speed** | **< 5ms (Ultra Fast)** | ~80ms (Contextual) |
+    | **Explainability (XAI)** | Exact Linear Weights | Attention Heatmaps / SHAP |
     """)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# Custom Footer
+st.markdown("""
+<div class="custom-footer">
+    Developed with ❤️ by <strong>Afsah Arshad</strong> | AI Practitioner & Data Science Specialist
+</div>
+""", unsafe_allow_html=True)
