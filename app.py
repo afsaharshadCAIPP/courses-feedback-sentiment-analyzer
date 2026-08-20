@@ -1,4 +1,3 @@
-
 import streamlit as st
 import joblib
 import pandas as pd
@@ -8,7 +7,7 @@ import plotly.graph_objects as go
 from transformers import pipeline
 
 # ==========================================
-# 1. PAGE CONFIG & ULTRA-PREMIUM DARK THEME
+# 1. PAGE CONFIG & HIGH-CONTRAST DARK THEME
 # ==========================================
 st.set_page_config(
     page_title="Customer Feedback AI Hub | Afsah Arshad",
@@ -17,135 +16,176 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Custom High-Contrast CSS Fixes
 st.markdown("""
 <style>
-    /* Global Background */
+    /* App Background */
     .stApp {
-        background: radial-gradient(circle at top right, #161b22, #0d1117);
-        color: #c9d1d9;
+        background-color: #0b0f17;
+        color: #e6edf3;
         font-family: 'Inter', -apple-system, sans-serif;
     }
     
-    /* Hero Header & Developer Badge */
+    /* Global Text & Label Fixes for Readability */
+    label, .stWidgetLabel, div[data-testid="stMarkdownContainer"] p, h1, h2, h3, h4, h5, h6 {
+        color: #f0f6fc !important;
+    }
+    
+    /* Header Container & Developer Badge */
     .header-container {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px 20px;
-        background: rgba(22, 27, 34, 0.6);
-        border: 1px solid rgba(48, 54, 61, 0.6);
+        padding: 16px 24px;
+        background: #161b22;
+        border: 1px solid #30363d;
         border-radius: 16px;
-        backdrop-filter: blur(12px);
         margin-bottom: 25px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
     .hero-title {
-        background: linear-gradient(135deg, #00F2FE 0%, #4FACFE 50%, #7F00FF 100%);
+        background: linear-gradient(135deg, #00F2FE 0%, #4FACFE 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 2.3rem;
+        font-size: 2.2rem;
         font-weight: 900;
-        letter-spacing: -0.5px;
         margin: 0;
     }
     .hero-sub {
-        color: #8b949e;
+        color: #8b949e !important;
         font-size: 0.95rem;
-        margin: 0;
+        margin-top: 4px;
     }
     .dev-badge {
-        background: linear-gradient(135deg, rgba(0,242,254,0.1), rgba(127,0,255,0.1));
+        background: #0d1117;
         border: 1px solid #00F2FE;
-        padding: 8px 18px;
-        border-radius: 30px;
+        padding: 10px 20px;
+        border-radius: 12px;
         text-align: right;
-        box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+    }
+    .dev-label {
+        color: #8b949e !important;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
     }
     .dev-name {
-        color: #00F2FE;
+        color: #00F2FE !important;
         font-weight: 800;
-        font-size: 1.05rem;
-        letter-spacing: 0.5px;
+        font-size: 1.15rem;
     }
 
-    /* Glassmorphic Animated Cards */
+    /* CRITICAL FIX: Streamlit Tabs High Visibility */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: #161b22;
+        padding: 8px;
+        border-radius: 12px;
+        border: 1px solid #30363d;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 45px;
+        border-radius: 8px;
+        color: #8b949e !important;
+        font-weight: 700 !important;
+        font-size: 0.95rem !important;
+        padding: 0 20px !important;
+        background-color: transparent !important;
+        border: none !important;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #1f293d !important;
+        color: #00F2FE !important;
+        border: 1px solid #00F2FE !important;
+        box-shadow: 0 0 10px rgba(0, 242, 254, 0.2) !important;
+    }
+
+    /* Glassmorphic Content Cards */
     .glass-card {
-        background: rgba(22, 27, 34, 0.75);
-        border: 1px solid rgba(48, 54, 61, 0.8);
+        background: #161b22;
+        border: 1px solid #30363d;
         border-radius: 16px;
         padding: 24px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease-in-out;
         margin-bottom: 20px;
-    }
-    .glass-card:hover {
-        border-color: #00F2FE;
-        box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
-        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
     
-    /* Glowing Sentiment Badges */
+    /* Glowing Badges */
     .badge-pos {
         background: rgba(16, 185, 129, 0.15);
-        border: 1px solid #10B981;
-        color: #10B981;
+        border: 1.5px solid #10B981;
+        color: #10B981 !important;
         padding: 10px 24px;
         border-radius: 30px;
         font-weight: 800;
         font-size: 1.25rem;
         display: inline-block;
-        box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
     }
     .badge-neg {
         background: rgba(239, 68, 68, 0.15);
-        border: 1px solid #EF4444;
-        color: #EF4444;
+        border: 1.5px solid #EF4444;
+        color: #EF4444 !important;
         padding: 10px 24px;
         border-radius: 30px;
         font-weight: 800;
         font-size: 1.25rem;
         display: inline-block;
-        box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.25);
     }
     .badge-neu {
         background: rgba(245, 158, 11, 0.15);
-        border: 1px solid #F59E0B;
-        color: #F59E0B;
+        border: 1.5px solid #F59E0B;
+        color: #F59E0B !important;
         padding: 10px 24px;
         border-radius: 30px;
         font-weight: 800;
         font-size: 1.25rem;
         display: inline-block;
-        box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
     }
 
-    /* Styled Inputs & Buttons */
+    /* Text Area Styling */
     .stTextArea textarea {
-        background-color: #161b22 !important;
+        background-color: #0d1117 !important;
         color: #f0f6fc !important;
         border: 1px solid #30363d !important;
         border-radius: 12px !important;
+        font-size: 1rem !important;
     }
+    
+    /* Action Buttons */
     .stButton>button {
         background: linear-gradient(135deg, #00F2FE 0%, #4FACFE 100%) !important;
-        color: #0d1117 !important;
+        color: #0b0f17 !important;
         border-radius: 12px !important;
         padding: 12px 28px !important;
         font-weight: 800 !important;
         border: none !important;
-        box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4) !important;
-        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(0, 242, 254, 0.35) !important;
     }
-    .stButton>button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 242, 254, 0.6) !important;
+    
+    /* Sidebar Fixes */
+    section[data-testid="stSidebar"] {
+        background-color: #161b22 !important;
+        border-right: 1px solid #30363d !important;
+    }
+    .sidebar-dev-card {
+        text-align: center;
+        padding: 14px;
+        background: #0d1117;
+        border-radius: 12px;
+        border: 1px solid #00F2FE;
+        margin-bottom: 20px;
     }
 
     /* Footer */
     .custom-footer {
         text-align: center;
         padding: 20px;
-        color: #8b949e;
+        color: #8b949e !important;
         font-size: 0.85rem;
         border-top: 1px solid #30363d;
         margin-top: 40px;
@@ -153,7 +193,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Main Header Banner with Name
+# Main Top Banner Header
 st.markdown("""
 <div class="header-container">
     <div>
@@ -161,8 +201,8 @@ st.markdown("""
         <p class="hero-sub">Multi-Engine Sentiment Intelligence & Explainable AI Platform</p>
     </div>
     <div class="dev-badge">
-        <span style="font-size: 0.75rem; color: #8b949e; text-transform: uppercase; letter-spacing: 1px;">Designed & Built By</span><br>
-        <span class="dev-name">Afsah Arshad</span>
+        <div class="dev-label">Designed & Built By</div>
+        <div class="dev-name">Afsah Arshad</div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -191,10 +231,10 @@ distilbert_pipe = load_distilbert()
 # 3. SIDEBAR CONTROLS
 # ==========================================
 st.sidebar.markdown("""
-<div style="text-align: center; padding: 10px; background: rgba(0,242,254,0.05); border-radius: 12px; border: 1px solid rgba(0,242,254,0.2); margin-bottom: 20px;">
-    <span style="color: #8b949e; font-size: 0.8rem;">DEVELOPER PROFILE</span><br>
-    <strong style="color: #f0f6fc; font-size: 1.1rem;">Afsah Arshad</strong><br>
-    <span style="color: #00F2FE; font-size: 0.8rem;">AI Practitioner</span>
+<div class="sidebar-dev-card">
+    <div style="color: #8b949e; font-size: 0.75rem; text-transform: uppercase;">DEVELOPER PROFILE</div>
+    <div style="color: #ffffff; font-weight: 800; font-size: 1.15rem; margin-top:2px;">Afsah Arshad</div>
+    <div style="color: #00F2FE; font-size: 0.85rem; font-weight: 600;">AI Practitioner & Specialist</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -226,7 +266,9 @@ tab1, tab2, tab3, tab4 = st.tabs([
     "⚔️ Architecture Benchmarks"
 ])
 
+# ------------------------------------------
 # TAB 1: LIVE WORKSPACE
+# ------------------------------------------
 with tab1:
     default_text = "" if sample_choice == "Custom Input" else sample_choice
     user_input = st.text_area("📝 Enter Customer Feedback:", value=default_text, height=120)
@@ -266,7 +308,7 @@ with tab1:
                     st.markdown('<div class="badge-neu">🟡 NEUTRAL</div>', unsafe_allow_html=True)
 
                 st.write("")
-                st.caption(f"Engine: `{selected_model}`")
+                st.caption(f"Active Engine: `{selected_model}`")
                 st.markdown('</div>', unsafe_allow_html=True)
 
             with col2:
@@ -292,10 +334,14 @@ with tab1:
                 st.plotly_chart(fig, use_container_width=True)
                 st.markdown('</div>', unsafe_allow_html=True)
 
+# ------------------------------------------
 # TAB 2: EXPLAINABLE AI
+# ------------------------------------------
 with tab2:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("### 🔍 Word-Level Feature Weight Impact")
+    st.write("Understand which specific words directly drove the AI's prediction:")
+    
     if user_input.strip() and tfidf_model:
         vec = vectorizer.transform([user_input])
         words = user_input.lower().split()
@@ -308,12 +354,21 @@ with tab2:
                 impact_list.append((word, 0.0))
                 
         df_impact = pd.DataFrame(impact_list, columns=['Word', 'Impact_Weight'])
-        fig_xai = px.bar(df_impact, x='Word', y='Impact_Weight', color='Impact_Weight', color_continuous_scale='RdYlGn')
+        fig_xai = px.bar(
+            df_impact, x='Word', y='Impact_Weight', 
+            color='Impact_Weight', 
+            color_continuous_scale='RdYlGn',
+            title="Model Word Coefficients Impact"
+        )
         fig_xai.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(fig_xai, use_container_width=True)
+    else:
+        st.info("💡 Enter customer text in 'Live Workspace' tab to view feature weights.")
     st.markdown('</div>', unsafe_allow_html=True)
 
+# ------------------------------------------
 # TAB 3: BATCH ANALYTICS
+# ------------------------------------------
 with tab3:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("### 📁 Bulk Feedback Analytics")
@@ -330,13 +385,18 @@ with tab3:
             m3.metric("Negative %", f"{(df_batch['Predicted_Sentiment']=='NEGATIVE').mean()*100:.1f}%")
             m4.metric("Neutral %", f"{(df_batch['Predicted_Sentiment']=='NEUTRAL').mean()*100:.1f}%")
             
-            fig_donut = px.pie(df_batch, names='Predicted_Sentiment', hole=0.5, color='Predicted_Sentiment',
-                               color_discrete_map={'POSITIVE': '#10B981', 'NEGATIVE': '#EF4444', 'NEUTRAL': '#F59E0B'})
+            fig_donut = px.pie(
+                df_batch, names='Predicted_Sentiment', hole=0.5, color='Predicted_Sentiment',
+                color_discrete_map={'POSITIVE': '#10B981', 'NEGATIVE': '#EF4444', 'NEUTRAL': '#F59E0B'},
+                title="Batch Sentiment Breakdown"
+            )
             fig_donut.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_donut, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
+# ------------------------------------------
 # TAB 4: ARCHITECTURE BENCHMARKS
+# ------------------------------------------
 with tab4:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("### ⚔️ Model Architecture Comparison")
@@ -353,6 +413,6 @@ with tab4:
 # Custom Footer
 st.markdown("""
 <div class="custom-footer">
-    Developed with ❤️ by <strong>Afsah Arshad</strong> | AI Practitioner & Data Science Specialist
+    Developed with ❤️ by <strong style="color: #00F2FE;">Afsah Arshad</strong> | AI Practitioner & Data Science Specialist
 </div>
 """, unsafe_allow_html=True)
