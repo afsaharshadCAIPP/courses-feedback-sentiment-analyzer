@@ -10,8 +10,8 @@ from transformers import pipeline
 # 1. PAGE CONFIG & HIGH-CONTRAST DARK THEME
 # ==========================================
 st.set_page_config(
-    page_title="Women's Clothing Sentiment Intelligence | Afsah Arshad",
-    page_icon="👗",
+    page_title="Customer Feedback Sentiment Analyzer | Afsah Arshad",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -228,8 +228,8 @@ st.markdown(css_code, unsafe_allow_html=True)
 header_html = """
 <div class="header-container">
     <div>
-        <p class="hero-title">👗 Women's Clothing Sentiment Intelligence</p>
-        <p class="hero-sub">E-Commerce Feedback Analyzer & Explainable AI Platform</p>
+        <p class="hero-title">⚡ Customer Feedback Sentiment Analyzer</p>
+        <p class="hero-sub">Multi-Engine Sentiment Intelligence & Explainable AI Platform</p>
     </div>
     <div class="dev-badge">
         <div class="dev-label">Designed & Built By</div>
@@ -323,7 +323,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # ------------------------------------------
 with tab1:
     default_text = "" if sample_choice == "Custom Input" else sample_choice
-    user_input = st.text_area("📝 Enter Women's Clothing Feedback:", value=default_text, height=120)
+    user_input = st.text_area("📝 Enter Customer Feedback:", value=default_text, height=120)
     
     if st.button("🚀 Run Sentiment Intelligence", use_container_width=True):
         if user_input.strip():
@@ -459,7 +459,6 @@ with tab4:
     
     with col_m1:
         st.markdown("#### 📊 Confusion Matrix (Test Set)")
-        # Plotly Heatmap for Confusion Matrix
         cm_data = [[412, 32, 16], [28, 385, 42], [12, 29, 544]]
         labels = ['Negative', 'Neutral', 'Positive']
         
