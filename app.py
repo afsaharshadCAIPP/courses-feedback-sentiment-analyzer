@@ -1,10 +1,20 @@
 import streamlit as st
 import joblib
+import json
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from transformers import pipeline
+from aspect_analyzer import analyze_review_aspects, analyze_batch, ASPECT_KEYWORDS
+
+@st.cache_data
+def load_metrics():
+    try:
+        with open("metrics.json") as f:
+            return json.load(f)
+    except Exception:
+        return None
 
 # ==========================================
 # 1. PAGE CONFIG & HIGH-CONTRAST DARK THEME
@@ -277,6 +287,7 @@ def load_distilbert():
 
 tfidf_model, vectorizer = load_tfidf()
 distilbert_pipe = load_distilbert()
+metrics_data = load_metrics()
 
 # ==========================================
 # 3. SIDEBAR CONTROLS
@@ -311,11 +322,12 @@ sample_choice = st.sidebar.selectbox(
 # ==========================================
 # 4. MAIN TABS WORKSPACE
 # ==========================================
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🎯 Live Workspace", 
     "🔍 Explainable AI (XAI)", 
     "📊 Batch CSV Analytics", 
-    "⚔️ Architecture Benchmarks"
+    "⚔️ Architecture Benchmarks",
+    "🧩 Aspect-Based Insights",
 ])
 
 # ------------------------------------------
@@ -398,21 +410,25 @@ with tab2:
     
     if user_input.strip() and tfidf_model and vectorizer:
         vec = vectorizer.transform([user_input])
+        pred_class = tfidf_model.predict(vec)[0]
+        class_idx = list(tfidf_model.classes_).index(pred_class)
+
         words = user_input.lower().split()
         impact_list = []
         for word in words:
             if word in vectorizer.vocabulary_:
                 idx = vectorizer.vocabulary_[word]
-                impact_list.append((word, tfidf_model.coef_[2][idx]))
+                impact_list.append((word, tfidf_model.coef_[class_idx][idx]))
             else:
                 impact_list.append((word, 0.0))
-                
+
+        st.caption(f"Showing word impact toward the predicted class: **{pred_class}**")
         df_impact = pd.DataFrame(impact_list, columns=['Word', 'Impact_Weight'])
         fig_xai = px.bar(
             df_impact, x='Word', y='Impact_Weight', 
             color='Impact_Weight', 
             color_continuous_scale='RdYlGn',
-            title="Model Word Coefficients Impact"
+            title=f"Model Word Coefficients Impact (toward {pred_class})"
         )
         fig_xai.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(fig_xai, use_container_width=True)
@@ -454,55 +470,199 @@ with tab3:
 with tab4:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("### ⚔️ Model Architecture & Evaluation Metrics")
-    
-    col_m1, col_m2 = st.columns([1, 1])
-    
-    with col_m1:
-        st.markdown("#### 📊 Confusion Matrix (Test Set)")
-        cm_data = [[412, 32, 16], [28, 385, 42], [12, 29, 544]]
-        labels = ['Negative', 'Neutral', 'Positive']
-        
-        fig_cm = px.imshow(
-            cm_data,
-            x=labels,
-            y=labels,
-            text_auto=True,
-            color_continuous_scale='Blues',
-            labels=dict(x="Predicted Class", y="Actual Ground Truth", color="Sample Count"),
-            aspect="auto"
-        )
-        fig_cm.update_layout(
-            template='plotly_dark',
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            height=320
-        )
-        st.plotly_chart(fig_cm, use_container_width=True)
-        
-    with col_m2:
-        st.markdown("#### 🎯 Classification Performance Report")
-        df_report = pd.DataFrame({
-            "Sentiment Class": ["NEGATIVE 🔴", "NEUTRAL 🟡", "POSITIVE 🟢", "Macro Avg 📐", "Weighted Avg ⚖️"],
-            "Precision": [0.91, 0.86, 0.90, 0.89, 0.89],
-            "Recall": [0.90, 0.85, 0.93, 0.89, 0.90],
-            "F1-Score": [0.90, 0.85, 0.92, 0.89, 0.90]
-        })
-        st.dataframe(df_report, use_container_width=True, hide_index=True)
-        
-        st.markdown("""
-        > **Key Takeaway:** Model exhibits highest sensitivity (**0.92 F1-Score**) on Positive customer reviews, while maintaining strong precision across edge-case negative feedback.
-        """)
+
+    if metrics_data is None:
+        st.warning("⚠️ metrics.json not found. Run train_model_real.py first to generate real evaluation metrics.")
+    else:
+        st.caption(f"📁 Dataset: {metrics_data.get('dataset', 'N/A')}")
+        st.caption(f"🏷️ Labels derived via: {metrics_data.get('label_source', 'N/A')}")
+
+        col_m1, col_m2 = st.columns([1, 1])
+
+        with col_m1:
+            st.markdown("#### 📊 Confusion Matrix (Real Test Set)")
+            cm_data = metrics_data["confusion_matrix"]
+            labels = metrics_data["labels"]
+
+            fig_cm = px.imshow(
+                cm_data,
+                x=labels,
+                y=labels,
+                text_auto=True,
+                color_continuous_scale='Blues',
+                labels=dict(x="Predicted Class", y="Actual Ground Truth", color="Sample Count"),
+                aspect="auto"
+            )
+            fig_cm.update_layout(
+                template='plotly_dark',
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                height=320
+            )
+            st.plotly_chart(fig_cm, use_container_width=True)
+
+        with col_m2:
+            st.markdown("#### 🎯 Classification Performance Report")
+            report = metrics_data["classification_report"]
+            rows = []
+            for lbl in metrics_data["labels"]:
+                r = report[lbl]
+                rows.append({
+                    "Sentiment Class": lbl,
+                    "Precision": round(r["precision"], 3),
+                    "Recall": round(r["recall"], 3),
+                    "F1-Score": round(r["f1-score"], 3),
+                    "Support": int(r["support"]),
+                })
+            rows.append({
+                "Sentiment Class": "Weighted Avg",
+                "Precision": round(report["weighted avg"]["precision"], 3),
+                "Recall": round(report["weighted avg"]["recall"], 3),
+                "F1-Score": round(report["weighted avg"]["f1-score"], 3),
+                "Support": int(report["weighted avg"]["support"]),
+            })
+            df_report = pd.DataFrame(rows)
+            st.dataframe(df_report, use_container_width=True, hide_index=True)
+
+            st.markdown(f"""
+            > **Overall Accuracy: {metrics_data['accuracy']*100:.1f}%** on a held-out real test set.
+            > NEUTRAL (3-star) reviews are hardest to classify — this matches real-world
+            > sentiment analysis behavior, since 3-star reviews mix positive and negative language.
+            """)
+
+        st.info(metrics_data.get("note", ""))
 
     st.markdown("---")
     st.markdown("#### Model Feature Comparison")
-    st.markdown("""
+    tfidf_acc = f"{metrics_data['accuracy']*100:.1f}% (measured, this dataset)" if metrics_data else "N/A"
+    st.markdown(f"""
     | Metric / Feature | TF-IDF + Logistic Regression | DistilBERT Transformer |
     | :--- | :--- | :--- |
     | **Architecture** | Linear Feature Matrix | Deep Bidirectional Transformer |
-    | **Benchmark Accuracy** | ~88.5% | **~92.4%** |
+    | **Accuracy** | **{tfidf_acc}** | ~91% *(publicly reported SST-2 benchmark, not measured on this dataset)* |
     | **Inference Speed** | **< 5ms (Ultra Fast)** | ~80ms (Contextual) |
     | **Explainability (XAI)** | Exact Linear Weights | Attention Heatmaps / SHAP |
     """)
+    st.caption("Note: DistilBERT accuracy above is a binary (positive/negative) benchmark from its model card, "
+               "not tested on our 3-class dataset — shown for architecture comparison only, not a direct apples-to-apples number.")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ------------------------------------------
+# TAB 5: ASPECT-BASED INSIGHTS
+# ------------------------------------------
+with tab5:
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.markdown("### 🧩 Aspect-Based Sentiment Analysis")
+    st.write(
+        "Most sentiment tools give ONE label per review. This breaks a review into "
+        "parts and reports sentiment separately for **Fabric/Quality, Fit/Sizing, "
+        "Price/Value, Delivery/Shipping, and Color/Appearance** — so you know exactly "
+        "*what* customers liked or disliked, not just *whether* they were happy."
+    )
+    st.caption(
+        "⚙️ How it works: the review is split into clauses (on commas, periods, "
+        "'but', 'however', etc.), each clause is matched to an aspect by keyword, "
+        "then scored using the same TF-IDF model as the other tabs. Delivery/Shipping "
+        "uses a small keyword-rule override, because the base clothing dataset barely "
+        "discusses shipping — so the ML model has weak signal there."
+    )
+    st.markdown("---")
+
+    sub_tab1, sub_tab2 = st.tabs(["🔎 Analyze One Review", "📊 Aggregate Across Many Reviews"])
+
+    # ---- Single review breakdown ----
+    with sub_tab1:
+        st.caption(f"Active Engine (from sidebar): `{selected_model}`")
+        aspect_input = st.text_area(
+            "Enter a customer review:",
+            value="Fabric is great but delivery was very late and honestly a bit overpriced.",
+            height=100,
+            key="aspect_input",
+        )
+        if st.button("🧩 Break Down by Aspect", use_container_width=True):
+            if aspect_input.strip():
+                badge_map = {"POSITIVE": "badge-pos", "NEGATIVE": "badge-neg", "NEUTRAL": "badge-neu"}
+                icon_map = {"POSITIVE": "🟢", "NEGATIVE": "🔴", "NEUTRAL": "🟡"}
+
+                results_by_engine = {}
+                if ("TF-IDF" in selected_model or "Compare" in selected_model) and vectorizer and tfidf_model:
+                    results_by_engine["TF-IDF"] = analyze_review_aspects(
+                        aspect_input, tfidf_model, vectorizer, engine="tfidf"
+                    )
+                if ("DistilBERT" in selected_model or "Compare" in selected_model) and distilbert_pipe:
+                    results_by_engine["DistilBERT"] = analyze_review_aspects(
+                        aspect_input, tfidf_model, vectorizer, engine="distilbert", distilbert_pipe=distilbert_pipe
+                    )
+
+                if not results_by_engine:
+                    st.warning("No engine available — check model files loaded correctly.")
+                elif not any(results_by_engine.values()):
+                    st.info("No known aspects (fabric, fit, price, delivery, color) were mentioned in this review.")
+                else:
+                    for engine_name, result in results_by_engine.items():
+                        if not result:
+                            continue
+                        st.markdown(f"##### Engine: {engine_name}")
+                        cols = st.columns(len(result))
+                        for col, (aspect, (sentiment, clause)) in zip(cols, result.items()):
+                            with col:
+                                st.markdown(f"**{aspect}**")
+                                st.markdown(
+                                    f'<div class="{badge_map[sentiment]}">{icon_map[sentiment]} {sentiment}</div>',
+                                    unsafe_allow_html=True,
+                                )
+                                st.caption(f'"{clause}"')
+                        st.markdown("")
+
+    # ---- Aggregate across many reviews ----
+    with sub_tab2:
+        st.write("See which aspects drive the most negative feedback across many reviews at once.")
+        st.caption(
+            "ℹ️ Aggregate mode always uses TF-IDF (not DistilBERT), regardless of the sidebar "
+            "engine setting — running a deep learning model on thousands of clauses would be "
+            "too slow for an interactive app. Use the DistilBERT engine in 'Analyze One Review' above."
+        )
+        sample_n = st.slider("Number of real dataset reviews to sample:", 100, 2000, 500, step=100)
+
+        if st.button("📊 Run Aggregate Aspect Analysis", use_container_width=True):
+            if tfidf_model and vectorizer:
+                try:
+                    df_full = pd.read_csv("womens_clothing_reviews.csv")
+                    sample_reviews = (
+                        df_full["Review Text"].dropna().sample(n=sample_n, random_state=42).tolist()
+                    )
+                    with st.spinner(f"Analyzing {sample_n} reviews..."):
+                        rows = analyze_batch(sample_reviews, tfidf_model, vectorizer)
+
+                    if not rows:
+                        st.info("No aspects detected in this sample.")
+                    else:
+                        df_agg = pd.DataFrame(rows)
+                        fig_agg = px.bar(
+                            df_agg, x="Aspect", y="Count", color="Sentiment",
+                            barmode="group",
+                            color_discrete_map={'POSITIVE': '#10B981', 'NEGATIVE': '#EF4444', 'NEUTRAL': '#F59E0B'},
+                            title=f"Aspect Sentiment Breakdown (sample of {sample_n} real reviews)",
+                        )
+                        fig_agg.update_layout(
+                            template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)',
+                            plot_bgcolor='rgba(0,0,0,0)',
+                        )
+                        st.plotly_chart(fig_agg, use_container_width=True)
+
+                        # Actionable takeaway: which aspect has the highest negative share
+                        neg = df_agg[df_agg["Sentiment"] == "NEGATIVE"].set_index("Aspect")["Count"]
+                        total = df_agg.groupby("Aspect")["Count"].sum()
+                        neg_share = (neg / total).fillna(0).sort_values(ascending=False)
+                        if len(neg_share) > 0:
+                            top_issue = neg_share.index[0]
+                            st.markdown(
+                                f"> 💡 **Actionable insight:** *{top_issue}* has the highest share of negative "
+                                f"mentions ({neg_share.iloc[0]*100:.0f}%) among reviews that mention it — "
+                                f"this is where a business should focus first."
+                            )
+                except FileNotFoundError:
+                    st.warning("womens_clothing_reviews.csv not found in this folder.")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Custom Footer

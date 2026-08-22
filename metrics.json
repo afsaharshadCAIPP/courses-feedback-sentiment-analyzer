@@ -1,0 +1,61 @@
+{
+  "dataset": "Women's Clothing E-Commerce Reviews (23,486 real customer reviews)",
+  "label_source": "Derived from Rating: 1-2=NEGATIVE, 3=NEUTRAL, 4-5=POSITIVE",
+  "labels": [
+    "NEGATIVE",
+    "NEUTRAL",
+    "POSITIVE"
+  ],
+  "confusion_matrix": [
+    [
+      286,
+      158,
+      30
+    ],
+    [
+      179,
+      260,
+      126
+    ],
+    [
+      152,
+      406,
+      2932
+    ]
+  ],
+  "classification_report": {
+    "NEGATIVE": {
+      "precision": 0.46353322528363045,
+      "recall": 0.6033755274261603,
+      "f1-score": 0.5242896425297892,
+      "support": 474.0
+    },
+    "NEUTRAL": {
+      "precision": 0.3155339805825243,
+      "recall": 0.46017699115044247,
+      "f1-score": 0.3743700503959683,
+      "support": 565.0
+    },
+    "POSITIVE": {
+      "precision": 0.9494818652849741,
+      "recall": 0.8401146131805157,
+      "f1-score": 0.8914563697172393,
+      "support": 3490.0
+    },
+    "accuracy": 0.7679399425921837,
+    "macro avg": {
+      "precision": 0.576183023717043,
+      "recall": 0.6345557105857061,
+      "f1-score": 0.5967053542143322,
+      "support": 4529.0
+    },
+    "weighted avg": {
+      "precision": 0.8195370186924545,
+      "recall": 0.7679399425921837,
+      "f1-score": 0.7885217706659323,
+      "support": 4529.0
+    }
+  },
+  "accuracy": 0.7679399425921837,
+  "note": "Computed from a real 80/20 train/test split on actual customer reviews. class_weight='balanced' used because real ratings are skewed toward positive. DistilBERT row in the comparison table is NOT measured on this dataset \u2014 it is the model's publicly reported SST-2 benchmark accuracy, shown for architecture comparison only."
+}
