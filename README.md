@@ -1,56 +1,81 @@
-# ⚡ Customer Feedback Sentiment Analyzer
+# Customer Feedback Sentiment Analyzer
+### Multilingual Course Review Sentiment Analyzer
 
-A high-performance, multi-engine Sentiment Intelligence & Explainable AI (XAI) web application built using **Streamlit**, **Scikit-Learn**, and **Hugging Face Transformers (DistilBERT)**.
+A sentiment analysis tool for course reviews. Classifies reviews as
+**positive**, **neutral**, or **negative**, and extracts which aspect
+of the course (content, instructor, pacing, assignments, structure)
+each review is talking about.
 
-This platform allows users to analyze customer product feedback in real-time, inspect word-level prediction drivers via Explainable AI, upload bulk feedback CSVs for batch analytics, and evaluate deep learning vs. traditional ML architecture benchmarks.
+Two models are included:
+1. **TF-IDF + Logistic Regression** — fast baseline, works well on English, weaker on non-English reviews.
+2. **Fine-tuned multilingual DistilBERT** (`distilbert-base-multilingual-cased`) — handles 100+ languages natively, since the dataset contains reviews in English, French, Chinese, Spanish, and more. See `multilingual_distilbert_sentiment.ipynb` (requires a GPU — run on Google Colab with a T4 runtime).
 
----
+## Dataset
+`course_reviews.csv` — 140,320 course reviews with 1-5 star ratings,
+spanning multiple languages (English, French, Chinese, Spanish, and more).
 
-## 🌟 Key Features
+Sentiment labels are derived from the star rating:
+- 1-2 stars -> negative
+- 3 stars -> neutral
+- 4-5 stars -> positive
 
-* **🎯 Live Workspace**: Real-time sentiment prediction (Positive, Negative, Neutral) with confidence probability distribution.
-* **🔍 Explainable AI (XAI)**: Feature-weight breakdown displaying which specific words drove the classification decision (fixed to use the correct predicted class, not always "Positive").
-* **📊 Batch CSV Analytics**: Bulk processing for customer review datasets with automated summary metrics and distribution charts.
-* **⚔️ Architecture Benchmarks**: Comparative analysis between **TF-IDF + Logistic Regression** and **DistilBERT Transformer**, with REAL confusion matrix and F1-Score metrics (not hardcoded placeholders).
-* **🧩 Aspect-Based Insights**: Goes beyond one label per review — breaks feedback into Fabric/Quality, Fit/Sizing, Price/Value, Delivery/Shipping, and Color/Appearance, and scores each separately. Surfaces which specific aspect drives the most negative feedback, so the "why" behind a sentiment is visible, not just the "what."
-* **🎨 High-Contrast UI**: Modern dark-themed dashboard with glassmorphism card layouts and custom product category badges.
+## Files
+| File | Purpose |
+|---|---|
+| `train_model_real.py` | Cleans the data, trains a TF-IDF + Logistic Regression classifier, saves the model and metrics |
+| `aspect_analyzer.py` | Keyword-based extraction of which course aspect a review discusses |
+| `app.py` | Flask API that serves predictions from the trained model |
+| `tfidf_vectorizer.pkl` | Fitted TF-IDF vectorizer |
+| `course_sentiment_model.pkl` | Trained Logistic Regression sentiment classifier |
+| `metrics.json` | Evaluation results (precision/recall/F1, confusion matrix) |
+| `requirements.txt` | Python dependencies |
+| `course_reviews.csv` | Training data |
+| `multilingual_distilbert_sentiment.ipynb` | Colab notebook: fine-tunes multilingual DistilBERT on the same data |
 
----
+## Results
+Overall accuracy: **89.2%**
 
-## 🛠️ Tech Stack
+| Class | Precision | Recall | F1-score |
+|---|---|---|---|
+| Negative | 0.455 | 0.622 | 0.526 |
+| Neutral | 0.243 | 0.469 | 0.320 |
+| Positive | 0.980 | 0.923 | 0.951 |
 
-* **Frontend / Dashboard**: Streamlit, HTML5, CSS3
-* **Machine Learning**: Scikit-Learn, Joblib
-* **Deep Learning (NLP)**: Hugging Face Transformers (`distilbert-base-uncased-finetuned-sst-2-english`), PyTorch
-* **Data Visualization**: Plotly Express, Plotly Graph Objects, Pandas, NumPy
+Full details in `metrics.json`.
 
----
+## How to run
 
-## 📊 Dataset & Model Training
-
-The TF-IDF + Logistic Regression model is trained on the **real** "Women's Clothing
-E-Commerce Reviews" dataset (23,486 customer reviews). Sentiment labels are derived
-from the star rating: 1-2★ = NEGATIVE, 3★ = NEUTRAL, 4-5★ = POSITIVE.
-
-Real evaluation metrics (confusion matrix, precision/recall/F1) are computed on a
-held-out 20% test split and saved to `metrics.json` — the app reads these directly,
-so the "Architecture Benchmarks" tab always reflects genuine, reproducible results
-rather than placeholder numbers.
-
-To retrain from scratch:
 ```bash
+pip install -r requirements.txt
+
+# train the model (regenerates the .pkl files and metrics.json)
 python train_model_real.py
+
+# start the API
+python app.py
 ```
 
-## 📂 Project Structure
+Then send a request:
+```bash
+curl -X POST http://localhost:5000/predict \
+  -H "Content-Type: application/json" \
+  -d '{"review": "The instructor was great but the pacing was too fast."}'
+```
 
-```text
-├── app.py                            # Main Streamlit application file
-├── aspect_analyzer.py                # Aspect-based sentiment logic (fabric/fit/price/delivery/color)
-├── train_model_real.py               # Trains model on real dataset, generates metrics.json
-├── womens_clothing_reviews.csv       # Real dataset (23,486 reviews)
-├── metrics.json                      # Real evaluation metrics (used by Tab 4)
-├── clothing_sentiment_model.pkl      # Trained Logistic Regression model
-├── tfidf_vectorizer.pkl             # Trained TF-IDF Vectorizer
-├── requirements.txt                  # Python dependencies list
-└── README.md                         # Project documentation
+## Running the multilingual DistilBERT model
+1. Open `multilingual_distilbert_sentiment.ipynb` in Google Colab.
+2. `Runtime -> Change runtime type -> T4 GPU`.
+3. Run all cells. Upload `course_reviews.csv` when prompted.
+4. Training takes roughly 30-60 minutes on a T4 GPU for 3 epochs over the full dataset.
+
+If you hit `ImportError: cannot import name 'VideoReader' from 'torchvision.io'`,
+run `!pip uninstall -y torchvision -q` before installing the other packages —
+torchvision isn't needed for this text-only task.
+
+## Notes
+- The TF-IDF model is a fast baseline. It works well on English text but is
+  less reliable on non-English reviews, since TF-IDF treats words in different
+  languages as unrelated — this is why the multilingual DistilBERT model is
+  included as the stronger alternative for this dataset.
+- The `neutral` class has the lowest F1-score in the TF-IDF model, largely
+  because it has far fewer training examples than the `positive` class.
