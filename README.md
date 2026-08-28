@@ -1,5 +1,4 @@
-# Customer Feedback Sentiment Analyzer
-### Multilingual Course Review Sentiment Analyzer
+# Course Feedback Sentiment Analyzer
 
 A sentiment analysis tool for course reviews. Classifies reviews as
 **positive**, **neutral**, or **negative**, and extracts which aspect

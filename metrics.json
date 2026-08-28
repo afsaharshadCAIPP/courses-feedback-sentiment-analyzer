@@ -1,61 +1,57 @@
 {
-  "dataset": "Women's Clothing E-Commerce Reviews (23,486 real customer reviews)",
-  "label_source": "Derived from Rating: 1-2=NEGATIVE, 3=NEUTRAL, 4-5=POSITIVE",
   "labels": [
-    "NEGATIVE",
-    "NEUTRAL",
-    "POSITIVE"
-  ],
-  "confusion_matrix": [
-    [
-      286,
-      158,
-      30
-    ],
-    [
-      179,
-      260,
-      126
-    ],
-    [
-      152,
-      406,
-      2932
-    ]
+    "negative",
+    "neutral",
+    "positive"
   ],
   "classification_report": {
-    "NEGATIVE": {
-      "precision": 0.46353322528363045,
-      "recall": 0.6033755274261603,
-      "f1-score": 0.5242896425297892,
-      "support": 474.0
+    "negative": {
+      "precision": 0.4554054054054054,
+      "recall": 0.6217712177121771,
+      "f1-score": 0.5257410296411856,
+      "support": 1084.0
     },
-    "NEUTRAL": {
-      "precision": 0.3155339805825243,
-      "recall": 0.46017699115044247,
-      "f1-score": 0.3743700503959683,
-      "support": 565.0
+    "neutral": {
+      "precision": 0.24290083005679336,
+      "recall": 0.46919831223628694,
+      "f1-score": 0.3200921128382268,
+      "support": 1185.0
     },
-    "POSITIVE": {
-      "precision": 0.9494818652849741,
-      "recall": 0.8401146131805157,
-      "f1-score": 0.8914563697172393,
-      "support": 3490.0
+    "positive": {
+      "precision": 0.9800782053920559,
+      "recall": 0.9230858693545261,
+      "f1-score": 0.9507286883609503,
+      "support": 25795.0
     },
-    "accuracy": 0.7679399425921837,
+    "accuracy": 0.8922819270239453,
     "macro avg": {
-      "precision": 0.576183023717043,
-      "recall": 0.6345557105857061,
-      "f1-score": 0.5967053542143322,
-      "support": 4529.0
+      "precision": 0.5594614802847516,
+      "recall": 0.6713517997676633,
+      "f1-score": 0.5988539436134542,
+      "support": 28064.0
     },
     "weighted avg": {
-      "precision": 0.8195370186924545,
-      "recall": 0.7679399425921837,
-      "f1-score": 0.7885217706659323,
-      "support": 4529.0
+      "precision": 0.9286849433852923,
+      "recall": 0.8922819270239453,
+      "f1-score": 0.9076845405542708,
+      "support": 28064.0
     }
   },
-  "accuracy": 0.7679399425921837,
-  "note": "Computed from a real 80/20 train/test split on actual customer reviews. class_weight='balanced' used because real ratings are skewed toward positive. DistilBERT row in the comparison table is NOT measured on this dataset \u2014 it is the model's publicly reported SST-2 benchmark accuracy, shown for architecture comparison only."
+  "confusion_matrix": [
+    [
+      674,
+      273,
+      137
+    ],
+    [
+      282,
+      556,
+      347
+    ],
+    [
+      524,
+      1460,
+      23811
+    ]
+  ]
 }
