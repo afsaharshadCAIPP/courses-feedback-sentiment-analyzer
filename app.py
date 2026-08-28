@@ -6,12 +6,12 @@ from aspect_analyzer import extract_aspects
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="CAIPP Analytics Studio | Super Shine",
+    page_title="CAIPP ABSA Studio | Super Shine",
     page_icon="📊",
     layout="wide"
 )
 
-# --- Custom High-Fi Looker Studio & NotebookLM CSS Styling ---
+# --- Custom High-Fi Looker Studio CSS Styling ---
 st.markdown("""
     <style>
     .main-header {
@@ -39,12 +39,12 @@ st.markdown("""
         margin-bottom: 20px;
         border: 1px solid #ECC94B;
     }
-    .report-card {
+    .aspect-card {
         background-color: #F7FAFC;
         border: 1px solid #E2E8F0;
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 15px;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
     }
     .university-banner {
         text-align: center;
@@ -58,9 +58,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Header & Branding ---
-st.markdown('<p class="main-header">📊 Super Shine: AI Sentiment & Intelligence Studio</p>', unsafe_allow_html=True)
-st.markdown('<p class="designer-tag">👑 Designed with NotebookLM & Looker Studio Precision by <b>Afsah Arshad</b> (CAIPP)</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Certified Artificial Intelligence Practitioner Professional Capstone Platform</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-header">📊 Super Shine: AI Sentiment & Aspect-Based Sentiment Analysis Studio</p>', unsafe_allow_html=True)
+st.markdown('<p class="designer-tag">👑 Designed with Looker Studio Precision by <b>Afsah Arshad</b> (CAIPP)</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-header">Aspect-Based Sentiment Analysis & Intelligence Platform</p>', unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -99,7 +99,7 @@ nav_mode = st.sidebar.radio(
     [
         "🔍 Live Review Inference & XAI", 
         "📈 Confusion Matrix & Classification Charts", 
-        "📑 NotebookLM Source Synthesis & ABSA", 
+        "🎯 Aspect-Based Sentiment Analysis", 
         "📁 Batch CSV Processing", 
         "📋 System & Model Card"
     ]
@@ -161,7 +161,7 @@ if nav_mode == "🔍 Live Review Inference & XAI":
                     st.info(f"### Overall Sentiment: **Neutral 😐** (Confidence: {confidence:.2f}%)")
 
                 # Aspect breakdown with safe handling
-                st.markdown("#### 🔍 Granular Aspect-Level Breakdown (ABSA)")
+                st.markdown("#### 🎯 Granular Aspect-Level Breakdown (Aspect-Based Sentiment Analysis)")
                 if isinstance(aspects, dict) and aspects:
                     for aspect, details in aspects.items():
                         st.write(f"- **{aspect.capitalize()}**: `{details}`")
@@ -233,45 +233,50 @@ elif nav_mode == "📈 Confusion Matrix & Classification Charts":
     st.line_chart(metrics_dist)
 
 # ==========================================
-# MODE 3: NOTEBOOKLM SOURCE SYNTHESIS & ABSA
+# MODE 3: ASPECT-BASED SENTIMENT ANALYSIS
 # ==========================================
-elif nav_mode == "📑 NotebookLM Source Synthesis & ABSA":
-    st.subheader("📑 NotebookLM Source Synthesis & Aspect-Based Sentiment Analysis (ABSA)")
-    st.write("Cross-module synthesis mapping student remarks against CAIPP curriculum components (Modules 01 to 16).")
+elif nav_mode == "🎯 Aspect-Based Sentiment Analysis":
+    st.subheader("🎯 Aspect-Based Sentiment Analysis Intelligence Hub")
+    st.write("Deep-dive evaluation breaking down student feedback across core academic and operational delivery aspects.")
 
-    st.markdown("""
-    <div class="report-card">
-        <h3>🧠 Source Document Grounding & Synthesis</h3>
-        <p>Using multi-source text embeddings and aspect-based categorization, student feedback has been synthesized across core curriculum tracks including <b>Machine Learning Fundamentals</b>, <b>Deep Learning & Transformers</b>, and <b>Model Explainability (SHAP)</b>[cite: 1].</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    col_r1, col_r2 = st.columns(2)
+    col_a1, col_a2 = st.columns(2)
     
-    with col_r1:
+    with col_a1:
         st.markdown("""
-        <div class="report-card">
-            <h4>🟢 Module Strengths (High Satisfaction)</h4>
-            <ul>
-                <li><b>Module 05 & 06</b>: Supervised & Tree-Based Models practical implementation.</li>
-                <li><b>Module 10</b>: NLP, Sequence Models & Transformer overviews.</li>
-                <li><b>Module 12</b>: Explainable AI & SHAP value interpretations.</li>
-            </ul>
+        <div class="aspect-card">
+            <h4>📚 Content Quality & Curriculum</h4>
+            <p><b>Satisfaction: 94.5%</b></p>
+            <p>Students praised the structured breakdown of machine learning pipelines, deep learning CNNs, and transformer modules.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="aspect-card">
+            <h4>👨‍🏫 Instructor Delivery & Support</h4>
+            <p><b>Satisfaction: 96.2%</b></p>
+            <p>High appreciation for clear explanations, practical coding labs, and interactive Q&A sessions.</p>
         </div>
         """, unsafe_allow_html=True)
 
-    with col_r2:
+    with col_a2:
         st.markdown("""
-        <div class="report-card">
-            <h4>🔴 Optimization Areas (Constructive Feedback)</h4>
-            <ul>
-                <li><b>Module 02</b>: Mathematical foundations & matrix calculus pace.</li>
-                <li><b>Module 13</b>: MLOps deployment pipeline complexity for beginners.</li>
-            </ul>
+        <div class="aspect-card">
+            <h4>⚡ Pacing & Speed</h4>
+            <p><b>Satisfaction: 78.4%</b></p>
+            <p>Some participants noted that advanced modules like MLOps deployment and mathematical foundations move quickly.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="aspect-card">
+            <h4>💻 Assignments & Labs</h4>
+            <p><b>Satisfaction: 88.9%</b></p>
+            <p>Hands-on Jupyter notebooks and Streamlit dashboard exercises received very positive engagement.</p>
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("#### 📊 Aspect-Based Sentiment Weight Distribution (ABSA)")
+    st.markdown("---")
+    st.markdown("#### 📊 Curriculum Aspect Satisfaction Comparison Chart")
     aspect_chart_data = pd.DataFrame({
         "Curriculum Aspect": ["Content Quality", "Instructor Delivery", "Pacing & Speed", "Assignments & Labs"],
         "Satisfaction Score (%)": [94.5, 96.2, 78.4, 88.9]
@@ -304,7 +309,7 @@ elif nav_mode == "📁 Batch CSV Processing":
                         label="📥 Download Processed Results CSV",
                         data=csv_data,
                         file_name="processed_feedback_results.csv",
-                        mime="text/csv"
+                        mime="text/css"
                     )
                 else:
                     st.error("Uploaded CSV must contain a 'Review' column matching the dataset schema.")
@@ -316,7 +321,7 @@ elif nav_mode == "📋 System & Model Card":
     st.subheader("📋 MLOps System & Model Metadata Card")
     
     st.markdown("""
-    * **Project Name**: Multilingual Customer Feedback & Aspect-Based Sentiment Analyzer (ABSA)
+    * **Project Name**: Multilingual Customer Feedback & Aspect-Based Sentiment Analyzer
     * **Author / Developer**: Afsah Arshad (Certified AI Practitioner Professional Candidate)[cite: 1]
     * **Institution**: PIQC Institute of Quality & NUST[cite: 1]
     * **Core Algorithms**: TF-IDF Vectorizer (`max_features=30000`, `ngram_range=(1,2)`), Logistic Regression (`C=5`, `class_weight='balanced'`), and fine-tuned Multilingual DistilBERT.
