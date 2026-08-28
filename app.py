@@ -60,7 +60,7 @@ st.markdown("""
 # --- Header & Branding ---
 st.markdown('<p class="main-header">📊 Super Shine: AI Sentiment & Intelligence Studio</p>', unsafe_allow_html=True)
 st.markdown('<p class="designer-tag">👑 Designed with NotebookLM & Looker Studio Precision by <b>Afsah Arshad</b> (CAIPP)</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Certified Artificial Intelligence Practitioner Professional Capstone Analytics Platform</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-header">Certified Artificial Intelligence Practitioner Professional Capstone Platform</p>', unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -99,7 +99,7 @@ nav_mode = st.sidebar.radio(
     [
         "🔍 Live Review Inference & XAI", 
         "📈 Confusion Matrix & Classification Charts", 
-        "📑 NotebookLM Executive Report", 
+        "📑 NotebookLM Source Synthesis & ABSA", 
         "📁 Batch CSV Processing", 
         "📋 System & Model Card"
     ]
@@ -161,7 +161,7 @@ if nav_mode == "🔍 Live Review Inference & XAI":
                     st.info(f"### Overall Sentiment: **Neutral 😐** (Confidence: {confidence:.2f}%)")
 
                 # Aspect breakdown with safe handling
-                st.markdown("#### 🔍 Granular Aspect-Level Breakdown")
+                st.markdown("#### 🔍 Granular Aspect-Level Breakdown (ABSA)")
                 if isinstance(aspects, dict) and aspects:
                     for aspect, details in aspects.items():
                         st.write(f"- **{aspect.capitalize()}**: `{details}`")
@@ -172,7 +172,7 @@ if nav_mode == "🔍 Live Review Inference & XAI":
                     st.info("No specific domain keywords matched; semantic fallback engaged.")
 
                 # SHAP / Feature Attribution Chart
-                st.markdown("#### 🧪 Explainable AI (SHAP Feature Impact)")
+                st.markdown("#### 🧪 Explainable AI (SHAP Feature Impact - Module 12)")
                 words = user_review.split()[:6]
                 if words:
                     shap_df = pd.DataFrame({
@@ -233,16 +233,16 @@ elif nav_mode == "📈 Confusion Matrix & Classification Charts":
     st.line_chart(metrics_dist)
 
 # ==========================================
-# MODE 3: NOTEBOOKLM EXECUTIVE REPORT
+# MODE 3: NOTEBOOKLM SOURCE SYNTHESIS & ABSA
 # ==========================================
-elif nav_mode == "📑 NotebookLM Executive Report":
-    st.subheader("📑 NotebookLM Style Executive Synthesis & Insights")
-    st.write("Automated qualitative and quantitative intelligence synthesis generated from course feedback sources.")
+elif nav_mode == "📑 NotebookLM Source Synthesis & ABSA":
+    st.subheader("📑 NotebookLM Source Synthesis & Aspect-Based Sentiment Analysis (ABSA)")
+    st.write("Cross-module synthesis mapping student remarks against CAIPP curriculum components (Modules 01 to 16).")
 
     st.markdown("""
     <div class="report-card">
-        <h3>🌟 Executive Summary</h3>
-        <p>Based on comprehensive text mining and aspect-level sentiment extraction across multi-batch training sessions, the overall sentiment distribution heavily leans towards <b>Positive (91.4%)</b>, reflecting high satisfaction with core course design and instruction delivery.</p>
+        <h3>🧠 Source Document Grounding & Synthesis</h3>
+        <p>Using multi-source text embeddings and aspect-based categorization, student feedback has been synthesized across core curriculum tracks including <b>Machine Learning Fundamentals</b>, <b>Deep Learning & Transformers</b>, and <b>Model Explainability (SHAP)</b>[cite: 1].</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -251,11 +251,11 @@ elif nav_mode == "📑 NotebookLM Executive Report":
     with col_r1:
         st.markdown("""
         <div class="report-card">
-            <h4>🟢 Key Strengths Identified</h4>
+            <h4>🟢 Module Strengths (High Satisfaction)</h4>
             <ul>
-                <li>Exceptional clarity in foundational machine learning and deep learning modules.</li>
-                <li>Strong engagement during practical hands-on coding and tooling labs.</li>
-                <li>Effective instructor communication and structured material delivery.</li>
+                <li><b>Module 05 & 06</b>: Supervised & Tree-Based Models practical implementation.</li>
+                <li><b>Module 10</b>: NLP, Sequence Models & Transformer overviews.</li>
+                <li><b>Module 12</b>: Explainable AI & SHAP value interpretations.</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)
@@ -263,19 +263,19 @@ elif nav_mode == "📑 NotebookLM Executive Report":
     with col_r2:
         st.markdown("""
         <div class="report-card">
-            <h4>🔴 Areas for Optimization</h4>
+            <h4>🔴 Optimization Areas (Constructive Feedback)</h4>
             <ul>
-                <li>Pacing adjustments required for complex MLOps and transformer deployment segments.</li>
-                <li>Additional preparatory documentation recommended for mathematical foundations.</li>
+                <li><b>Module 02</b>: Mathematical foundations & matrix calculus pace.</li>
+                <li><b>Module 13</b>: MLOps deployment pipeline complexity for beginners.</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("#### 📊 Aspect Sentiment Weight Distribution")
+    st.markdown("#### 📊 Aspect-Based Sentiment Weight Distribution (ABSA)")
     aspect_chart_data = pd.DataFrame({
-        "Aspect Category": ["Content Quality", "Instructor Delivery", "Pacing & Speed", "Assignments & Labs"],
+        "Curriculum Aspect": ["Content Quality", "Instructor Delivery", "Pacing & Speed", "Assignments & Labs"],
         "Satisfaction Score (%)": [94.5, 96.2, 78.4, 88.9]
-    }).set_index("Aspect Category")
+    }).set_index("Curriculum Aspect")
     st.bar_chart(aspect_chart_data)
 
 # ==========================================
@@ -304,7 +304,7 @@ elif nav_mode == "📁 Batch CSV Processing":
                         label="📥 Download Processed Results CSV",
                         data=csv_data,
                         file_name="processed_feedback_results.csv",
-                        mime="text/css"
+                        mime="text/csv"
                     )
                 else:
                     st.error("Uploaded CSV must contain a 'Review' column matching the dataset schema.")
@@ -316,11 +316,11 @@ elif nav_mode == "📋 System & Model Card":
     st.subheader("📋 MLOps System & Model Metadata Card")
     
     st.markdown("""
-    * **Project Name**: Multilingual Customer Feedback & Aspect Sentiment Analyzer
-    * **Author / Developer**: Afsah Arshad (Certified AI Practitioner Professional Candidate)
-    * **Institution**: PIQC Institute of Quality & NUST
+    * **Project Name**: Multilingual Customer Feedback & Aspect-Based Sentiment Analyzer (ABSA)
+    * **Author / Developer**: Afsah Arshad (Certified AI Practitioner Professional Candidate)[cite: 1]
+    * **Institution**: PIQC Institute of Quality & NUST[cite: 1]
     * **Core Algorithms**: TF-IDF Vectorizer (`max_features=30000`, `ngram_range=(1,2)`), Logistic Regression (`C=5`, `class_weight='balanced'`), and fine-tuned Multilingual DistilBERT.
-    * **Evaluation Standards**: Precision, Recall, F1-Score, SHAP Feature Attribution, and Automated Confusion Matrix verification.
+    * **Evaluation Standards**: Precision, Recall, F1-Score, SHAP Feature Attribution (Module 12), and Automated Confusion Matrix verification[cite: 1].
     """)
 
 # --- University & Academic Partners Footer ---
