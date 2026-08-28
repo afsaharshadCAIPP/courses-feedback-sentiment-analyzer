@@ -2,6 +2,7 @@ import pickle
 import streamlit as st
 import pandas as pd
 import numpy as np
+import plotly.express as px
 from aspect_analyzer import extract_aspects
 
 # --- Page Configuration ---
@@ -281,14 +282,20 @@ if nav_mode == "🔍 Live Review Inference & XAI":
                 else:
                     st.info("No specific domain keywords matched; semantic fallback engaged.")
 
-                # SHAP / Feature Attribution Chart
+                # SHAP / Feature Attribution Chart using Plotly
                 st.markdown("#### 🧪 Explainable AI (SHAP Feature Impact)")
                 words = user_review.split()[:6]
                 if words:
                     shap_df = pd.DataFrame({
+                        "Word": words,
                         "Impact Score": np.random.uniform(-0.8, 0.9, len(words))
-                    }, index=words)
-                    st.bar_chart(shap_df)
+                    })
+                    fig_shap = px.bar(
+                        shap_df, x="Word", y="Impact Score", color="Impact Score",
+                        color_continuous_scale="RdBu", template="plotly_dark"
+                    )
+                    fig_shap.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10))
+                    st.plotly_chart(fig_shap, use_container_width=True)
 
     with col2:
         st.subheader("💡 Studio Metrics")
@@ -299,9 +306,15 @@ if nav_mode == "🔍 Live Review Inference & XAI":
         st.markdown("---")
         st.markdown("#### 🍩 Sentiment Share Distribution")
         donut_df = pd.DataFrame({
-            "Share (%)": [78, 14, 8]
-        }, index=["Positive", "Neutral", "Negative"])
-        st.bar_chart(donut_df)
+            "Sentiment": ["Positive", "Neutral", "Negative"],
+            "Share": [78, 14, 8]
+        })
+        fig_donut = px.pie(
+            donut_df, names="Sentiment", values="Share", hole=0.55,
+            color_discrete_sequence=["#00F2FE", "#4FACFE", "#FF3366"], template="plotly_dark"
+        )
+        fig_donut.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10), showlegend=True)
+        st.plotly_chart(fig_donut, use_container_width=True)
 
 # ==========================================
 # MODE 2: CONFUSION MATRIX & DECISION DASHBOARD
@@ -336,9 +349,15 @@ elif nav_mode == "📈 Confusion Matrix & Decision Dashboard":
     with col_c2:
         st.markdown("#### 📊 Per-Class F1-Score Reliability")
         perf_df = pd.DataFrame({
+            "Sentiment": ["Negative", "Neutral", "Positive"],
             "F1-Score": [0.74, 0.68, 0.94]
-        }, index=["Negative", "Neutral", "Positive"])
-        st.bar_chart(perf_df)
+        })
+        fig_f1 = px.bar(
+            perf_df, x="Sentiment", y="F1-Score", color="F1-Score",
+            color_continuous_scale="Viridis", template="plotly_dark"
+        )
+        fig_f1.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10))
+        st.plotly_chart(fig_f1, use_container_width=True)
 
     st.markdown("---")
     st.subheader("🎯 Executive Action & Decision Insights")
@@ -360,12 +379,6 @@ elif nav_mode == "📈 Confusion Matrix & Decision Dashboard":
             <p><b>Neutral/Negative Boundary Confusion</b>: Some neutral feedback gets misclassified as negative or vice versa. <b>Action Plan</b>: Faculty should manually review feedback flagged in the neutral/negative borderline to address student concerns instantly.</p>
         </div>
         """, unsafe_allow_html=True)
-
-    st.markdown("#### 📉 Classification Report Metrics Distribution Across Sentiments")
-    metrics_dist = pd.DataFrame({
-        "Score Value": [0.92, 0.88, 0.91, 0.89]
-    }, index=["Precision", "Recall", "F1-Score", "Support Accuracy"])
-    st.line_chart(metrics_dist)
 
 # ==========================================
 # MODE 3: ASPECT-BASED SENTIMENT ANALYSIS
@@ -416,16 +429,27 @@ elif nav_mode == "🎯 Aspect-Based Sentiment Analysis":
     with col_ch1:
         st.markdown("#### 📊 Curriculum Aspect Satisfaction Bar Chart")
         aspect_chart_data = pd.DataFrame({
+            "Aspect": ["Content Quality", "Instructor Delivery", "Pacing & Speed", "Assignments & Labs"],
             "Satisfaction Score (%)": [94.5, 96.2, 78.4, 88.9]
-        }, index=["Content Quality", "Instructor Delivery", "Pacing & Speed", "Assignments & Labs"])
-        st.bar_chart(aspect_chart_data)
+        })
+        fig_aspect = px.bar(
+            aspect_chart_data, x="Aspect", y="Satisfaction Score (%)", color="Satisfaction Score (%)",
+            color_continuous_scale="Teal", template="plotly_dark"
+        )
+        fig_aspect.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10))
+        st.plotly_chart(fig_aspect, use_container_width=True)
 
     with col_ch2:
         st.markdown("#### 🍩 Aspect Weight Distribution")
         aspect_weight_df = pd.DataFrame({
+            "Aspect": ["Content Quality", "Instructor Delivery", "Pacing & Speed", "Assignments & Labs"],
             "Weight": [30, 35, 15, 20]
-        }, index=["Content Quality", "Instructor Delivery", "Pacing & Speed", "Assignments & Labs"])
-        st.bar_chart(aspect_weight_df)
+        })
+        fig_donut_aspect = px.pie(
+            aspect_weight_df, names="Aspect", values="Weight", hole=0.55, template="plotly_dark"
+        )
+        fig_donut_aspect.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10), showlegend=True)
+        st.plotly_chart(fig_donut_aspect, use_container_width=True)
 
 # ==========================================
 # MODE 4: BATCH CSV PROCESSING
