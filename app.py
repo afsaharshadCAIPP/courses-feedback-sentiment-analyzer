@@ -5,9 +5,9 @@ import numpy as np
 import plotly.express as px
 from aspect_analyzer import extract_aspects
 
-# --- Page Configuration ---
+# --- Page Configuration (Streamlit Logo + Custom Title) ---
 st.set_page_config(
-    page_title="Customer Feedback Sentiment Analyzer",
+    page_title="Afsah Arshad | Customer Feedback Sentiment Analyzer",
     page_icon="⚡",
     layout="wide"
 )
