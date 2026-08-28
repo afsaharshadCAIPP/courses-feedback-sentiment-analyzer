@@ -11,106 +11,131 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- Custom Ultra-Modern Dark Cinematic CSS Styling ---
+# --- Custom Ultra-Modern Infographic Dark CSS Styling ---
 st.markdown("""
     <style>
-    /* Main Background & Global Text */
+    /* Main Background & Global Text Clarity */
     .stApp {
-        background-color: #0B0F19;
-        color: #F3F4F6;
+        background-color: #07090E;
+        color: #F8FAFC;
     }
     
-    /* Top Header Branding */
+    /* Top Header Branding with Golden Glow */
     .author-name-top {
-        font-size: 28px;
+        font-size: 30px;
         font-weight: 900;
-        color: #F6E05E;
+        color: #FFE600;
         text-align: center;
         margin-bottom: 0px;
         text-transform: uppercase;
         letter-spacing: 2px;
-        text-shadow: 0 0 20px rgba(246, 224, 94, 0.4);
+        text-shadow: 0 0 15px rgba(255, 230, 0, 0.7), 0 0 30px rgba(255, 230, 0, 0.4);
     }
     .author-sub-top {
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 700;
-        color: #FEB2B2;
+        color: #FF6B6B;
         text-align: center;
-        margin-bottom: 15px;
-        letter-spacing: 1px;
+        margin-bottom: 12px;
+        letter-spacing: 1.5px;
+        text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
     }
     .main-header {
-        font-size: 34px;
+        font-size: 36px;
         font-weight: 800;
-        color: #FFFFFF;
         text-align: center;
         margin-bottom: 5px;
-        background: linear-gradient(90deg, #63B3ED, #9F7AEA, #ED64A6);
+        background: linear-gradient(90deg, #00F2FE, #4FACFE, #00C6FF);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
     }
     .sub-header {
-        font-size: 15px;
-        font-weight: 400;
-        color: #9CA3AF;
+        font-size: 16px;
+        font-weight: 500;
+        color: #CBD5E1;
         text-align: center;
         margin-bottom: 25px;
     }
 
-    /* Cards & Containers */
+    /* Infographic Card Design */
     .aspect-card {
-        background: linear-gradient(135deg, #161E2E 0%, #1F2937 100%);
+        background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
         border: 1px solid #374151;
+        border-left: 4px solid #00F2FE;
         padding: 20px;
-        border-radius: 12px;
+        border-radius: 10px;
         margin-bottom: 15px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
     }
     .insight-card {
-        background: linear-gradient(135deg, #1A202C 0%, #1E3A8A 100%);
-        border-left: 5px solid #3B82F6;
-        border-top: 1px solid #374151;
-        border-right: 1px solid #374151;
-        border-bottom: 1px solid #374151;
+        background: linear-gradient(135deg, #0F172A 100%, #1E3A8A 100%);
+        border-left: 5px solid #00F2FE;
+        border-top: 1px solid #334155;
+        border-right: 1px solid #334155;
+        border-bottom: 1px solid #334155;
         padding: 20px;
         border-radius: 10px;
         margin-bottom: 15px;
-        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.15);
+        box-shadow: 0 6px 20px rgba(0, 242, 254, 0.15);
     }
     .action-card {
-        background: linear-gradient(135deg, #1A202C 0%, #7F1D1D 100%);
+        background: linear-gradient(135deg, #0F172A 100%, #7F1D1D 100%);
         border-left: 5px solid #EF4444;
-        border-top: 1px solid #374151;
-        border-right: 1px solid #374151;
-        border-bottom: 1px solid #374151;
+        border-top: 1px solid #334155;
+        border-right: 1px solid #334155;
+        border-bottom: 1px solid #334155;
         padding: 20px;
         border-radius: 10px;
         margin-bottom: 15px;
-        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.15);
     }
 
-    /* Sidebar Customization */
-    [data-testid="stSidebar"] {
-        background-color: #07090E;
+    /* Sidebar Customization with Blue Neon Name */
+    [data-testid="sidebar-content"], [data-testid="stSidebar"] {
+        background-color: #030712;
         border-right: 1px solid #1F2937;
     }
+    .sidebar-name {
+        font-size: 20px;
+        font-weight: 800;
+        color: #00F2FE;
+        text-align: center;
+        text-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
+        margin-bottom: 0px;
+        letter-spacing: 1px;
+    }
+    .sidebar-sub {
+        font-size: 13px;
+        font-weight: 700;
+        color: #FF6B6B;
+        text-align: center;
+        margin-top: -5px;
+        margin-bottom: 15px;
+    }
 
-    /* Metric Cards Styling */
+    /* Streamlit Overrides for Text Visibility */
+    h1, h2, h3, h4, h5, h6, p, span, label {
+        color: #F1F5F9 !important;
+    }
+    
+    /* Metric Cards Brightening */
     [data-testid="stMetricValue"] {
-        color: #63B3ED !important;
-        font-weight: 800 !important;
+        color: #00F2FE !important;
+        font-weight: 900 !important;
+        text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
     }
     [data-testid="stMetricLabel"] {
-        color: #9CA3AF !important;
+        color: #94A3B8 !important;
     }
 
     /* Footer */
     .university-banner {
         text-align: center;
         font-size: 13px;
-        color: #6B7280;
+        color: #64748B;
         margin-top: 40px;
-        letter-spacing: 1.5px;
+        letter-spacing: 2px;
         text-transform: uppercase;
     }
     </style>
@@ -152,9 +177,9 @@ def load_sample_reviews():
 
 demo_options = load_sample_reviews()
 
-# --- Sidebar Control Center ---
-st.sidebar.markdown("<h3 style='color: #F6E05E; text-align: center;'>Afsah Arshad</h3>", unsafe_allow_html=True)
-st.sidebar.markdown("<p style='color: #FEB2B2; font-weight: 600; text-align: center; margin-top: -15px;'>A.I Practitioner Professional</p>", unsafe_allow_html=True)
+# --- Sidebar Control Center with Blue Neon Name ---
+st.sidebar.markdown('<p class="sidebar-name">Afsah Arshad</p>', unsafe_allow_html=True)
+st.sidebar.markdown('<p class="sidebar-sub">A.I Practitioner Professional</p>', unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
 st.sidebar.title("⚙️ Studio Navigation")
