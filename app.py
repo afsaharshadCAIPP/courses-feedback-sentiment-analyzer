@@ -70,6 +70,20 @@ def load_models():
 
 vectorizer, model = load_models()
 
+# --- Load Real Reviews from Dataset for Dropdown ---
+@st.cache_data
+def load_sample_reviews():
+    try:
+        df = pd.read_csv("course_reviews.csv")
+        if "Review" in df.columns:
+            real_reviews = df["Review"].dropna().sample(5, random_state=42).tolist()
+            return ["-- Select Real Review from course_reviews.csv --"] + real_reviews
+    except Exception:
+        pass
+    return ["-- Select Real Review from course_reviews.csv --", "Dataset or Review column not found, please type manually below."]
+
+demo_options = load_sample_reviews()
+
 # --- Sidebar Control Center ---
 st.sidebar.title("⚙️ MLOps & Navigation")
 nav_mode = st.sidebar.radio(
@@ -96,24 +110,14 @@ if nav_mode == "🔍 Live Review Inference & XAI":
     with col1:
         st.subheader("📝 Single Text Review Analysis")
         
-        # Preset Demo Remarks options
-        demo_options = [
-            "-- Select Custom Student Remark or Type Below --",
-            "🌟 The course content was exceptionally structured, and the instructor explained deep learning brilliantly!",
-            "⚠️ The pacing of the machine learning modules was way too fast for beginners, and assignments were confusing.",
-            "😐 The lectures were okay, but we needed more practical labs on MLOps and transformer deployment.",
-            "🔥 Outstanding practical sessions! The SHAP and model explainability modules completely transformed my perspective on AI."
-        ]
+        selected_preset = st.selectbox("📌 Choose Real Review from Dataset:", demo_options)
         
-        selected_preset = st.selectbox("📌 Or Choose Preset Student Remarks for Quick Test:", demo_options)
-        
-        # Pre-fill text area if a preset is chosen (ignoring the prompt title)
         default_text = "" if selected_preset.startswith("--") else selected_preset
 
         user_review = st.text_area(
-            "Enter or modify student remarks:",
+            "Enter or modify review text:",
             value=default_text,
-            placeholder="e.g., The course content was exceptionally structured...",
+            placeholder="Type or select review here...",
             height=140
         )
 
@@ -143,11 +147,14 @@ if nav_mode == "🔍 Live Review Inference & XAI":
                 else:
                     st.info(f"### Overall Sentiment: **Neutral 😐** (Confidence: {confidence:.2f}%)")
 
-                # Aspect breakdown
+                # Aspect breakdown with 100% safe error handling
                 st.markdown("#### 🔍 Granular Aspect-Level Breakdown")
-                if aspects:
+                if isinstance(aspects, dict) and aspects:
                     for aspect, details in aspects.items():
                         st.write(f"- **{aspect.capitalize()}**: `{details}`")
+                elif isinstance(aspects, list) and aspects:
+                    for item in aspects:
+                        st.write(f"- `{item}`")
                 else:
                     st.info("No specific domain keywords matched; semantic fallback engaged.")
 
