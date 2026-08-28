@@ -95,15 +95,31 @@ if nav_mode == "🔍 Live Review Inference & XAI":
 
     with col1:
         st.subheader("📝 Single Text Review Analysis")
+        
+        # Preset Demo Remarks options
+        demo_options = [
+            "-- Select Custom Student Remark or Type Below --",
+            "🌟 The course content was exceptionally structured, and the instructor explained deep learning brilliantly!",
+            "⚠️ The pacing of the machine learning modules was way too fast for beginners, and assignments were confusing.",
+            "😐 The lectures were okay, but we needed more practical labs on MLOps and transformer deployment.",
+            "🔥 Outstanding practical sessions! The SHAP and model explainability modules completely transformed my perspective on AI."
+        ]
+        
+        selected_preset = st.selectbox("📌 Or Choose Preset Student Remarks for Quick Test:", demo_options)
+        
+        # Pre-fill text area if a preset is chosen (ignoring the prompt title)
+        default_text = "" if selected_preset.startswith("--") else selected_preset
+
         user_review = st.text_area(
-            "Enter student or customer remarks:",
-            placeholder="e.g., The course content was exceptionally structured, but the assignment pacing was fast...",
+            "Enter or modify student remarks:",
+            value=default_text,
+            placeholder="e.g., The course content was exceptionally structured...",
             height=140
         )
 
         if st.button("🚀 Run Prediction & Explainability", type="primary", use_container_width=True):
             if not user_review.strip():
-                st.warning("Please enter feedback text to execute inference.")
+                st.warning("Please enter or select feedback text to execute inference.")
             else:
                 with st.spinner(f"Executing pipeline via **{model_choice}**..."):
                     if vectorizer and model:
@@ -165,7 +181,6 @@ elif nav_mode == "📊 Confusion Matrix & Metrics":
     col_m3.metric("Weighted Avg Precision", "92.87%")
 
     st.markdown("#### Confusion Matrix Heatmap Representation")
-    # Simulated confusion matrix structure matching true evaluation output
     cm_data = np.array([
         [673, 112, 299],
         [152, 556, 477],
