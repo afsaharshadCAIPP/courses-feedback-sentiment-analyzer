@@ -2,8 +2,15 @@ import pickle
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
-import plotly.graph_objects as go
+
+# Safe import for Plotly
+try:
+    import plotly.express as px
+    import plotly.graph_objects as go
+    PLOTLY_AVAILABLE = True
+except ImportError:
+    PLOTLY_AVAILABLE = False
+
 from aspect_analyzer import extract_aspects
 
 # --- Page Configuration ---
@@ -292,9 +299,12 @@ if nav_mode == "🔍 Live Review Inference & XAI":
             "Sentiment": ["Positive", "Neutral", "Negative"],
             "Share": [78, 14, 8]
         })
-        fig_donut = px.pie(donut_df, names="Sentiment", values="Share", hole=0.5, color_discrete_sequence=["#00F2FE", "#F6E05E", "#EF4444"])
-        fig_donut.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#FFFFFF", margin=dict(t=10, b=10, l=10, r=10), height=220)
-        st.plotly_chart(fig_donut, use_container_width=True)
+        if PLOTLY_AVAILABLE:
+            fig_donut = px.pie(donut_df, names="Sentiment", values="Share", hole=0.5, color_discrete_sequence=["#00F2FE", "#F6E05E", "#EF4444"])
+            fig_donut.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#FFFFFF", margin=dict(t=10, b=10, l=10, r=10), height=220)
+            st.plotly_chart(fig_donut, use_container_width=True)
+        else:
+            st.bar_chart(donut_df.set_index("Sentiment"))
 
 # ==========================================
 # MODE 2: CONFUSION MATRIX & DECISION DASHBOARD
@@ -315,7 +325,7 @@ elif nav_mode == "📈 Confusion Matrix & Decision Dashboard":
     col_c1, col_c2 = st.columns(2)
     
     with col_c1:
-        st.markdown("#### 🔢 Confusion Matrix Interactive Heatmap")
+        st.markdown("#### 🔢 Confusion Matrix Heatmap")
         cm_data = np.array([
             [673, 112, 299],
             [152, 556, 477],
@@ -323,22 +333,27 @@ elif nav_mode == "📈 Confusion Matrix & Decision Dashboard":
         ])
         labels = ["Negative", "Neutral", "Positive"]
         
-        fig_cm = px.imshow(
-            cm_data,
-            labels=dict(x="Predicted Class", y="Actual Class", color="Count"),
-            x=labels,
-            y=labels,
-            text_auto=True,
-            color_continuous_scale="Blues"
-        )
-        fig_cm.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font_color="#FFFFFF",
-            margin=dict(t=20, b=20, l=20, r=20),
-            height=320
-        )
-        st.plotly_chart(fig_cm, use_container_width=True)
+        if PLOTLY_AVAILABLE:
+            fig_cm = px.imshow(
+                cm_data,
+                labels=dict(x="Predicted Class", y="Actual Class", color="Count"),
+                x=labels,
+                y=labels,
+                text_auto=True,
+                color_continuous_scale="Blues"
+            )
+            fig_cm.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                font_color="#FFFFFF",
+                margin=dict(t=20, b=20, l=20, r=20),
+                height=320
+            )
+            st.plotly_chart(fig_cm, use_container_width=True)
+        else:
+            cm_df = pd.DataFrame(cm_data, index=labels, columns=labels)
+            st.dataframe(cm_df, use_container_width=True)
+            
         st.info("💡 **Reading Guide**: High concentration on the bottom-right diagonal confirms exceptional detection of positive course reviews.")
 
     with col_c2:
@@ -437,9 +452,12 @@ elif nav_mode == "🎯 Aspect-Based Sentiment Analysis":
             "Aspect": ["Content Quality", "Instructor Delivery", "Pacing & Speed", "Assignments & Labs"],
             "Weight": [30, 35, 15, 20]
         })
-        fig_aspect_donut = px.pie(aspect_donut_df, names="Aspect", values="Weight", hole=0.5, color_discrete_sequence=["#00F2FE", "#4FACFE", "#F6E05E", "#EF4444"])
-        fig_aspect_donut.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#FFFFFF", margin=dict(t=10, b=10, l=10, r=10), height=300)
-        st.plotly_chart(fig_aspect_donut, use_container_width=True)
+        if PLOTLY_AVAILABLE:
+            fig_aspect_donut = px.pie(aspect_donut_df, names="Aspect", values="Weight", hole=0.5, color_discrete_sequence=["#00F2FE", "#4FACFE", "#F6E05E", "#EF4444"])
+            fig_aspect_donut.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#FFFFFF", margin=dict(t=10, b=10, l=10, r=10), height=300)
+            st.plotly_chart(fig_aspect_donut, use_container_width=True)
+        else:
+            st.bar_chart(aspect_donut_df.set_index("Aspect"))
 
 # ==========================================
 # MODE 4: BATCH CSV PROCESSING
