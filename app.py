@@ -2,15 +2,6 @@ import pickle
 import streamlit as st
 import pandas as pd
 import numpy as np
-
-# Safe import for Plotly
-try:
-    import plotly.express as px
-    import plotly.graph_objects as go
-    PLOTLY_AVAILABLE = True
-except ImportError:
-    PLOTLY_AVAILABLE = False
-
 from aspect_analyzer import extract_aspects
 
 # --- Page Configuration ---
@@ -20,34 +11,42 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- Custom Ultra-Modern Infographic Dark CSS Styling ---
+# --- Custom Ultra-Modern Panaflex Night Neon CSS Styling ---
 st.markdown("""
     <style>
     /* Main Background & Global Text Clarity */
     .stApp {
-        background-color: #07090E;
+        background-color: #05070B;
         color: #F8FAFC;
     }
     
-    /* Top Header Branding with Golden Neon Shine */
+    /* Top Header Branding with Authentic Panaflex Night Neon Glow */
     .author-name-top {
-        font-size: 32px;
+        font-size: 34px;
         font-weight: 900;
-        color: #FFE600;
+        color: #FFF033;
         text-align: center;
         margin-bottom: 0px;
         text-transform: uppercase;
-        letter-spacing: 2.5px;
-        text-shadow: 0 0 20px rgba(255, 230, 0, 0.9), 0 0 40px rgba(255, 230, 0, 0.6), 0 0 60px rgba(255, 230, 0, 0.3);
+        letter-spacing: 3px;
+        text-shadow: 
+            0 0 5px #FFF033, 
+            0 0 10px #FFF033, 
+            0 0 20px #FFD700, 
+            0 0 40px #FF8C00, 
+            0 0 80px #FF4500;
     }
     .author-sub-top {
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 700;
-        color: #FF6B6B;
+        color: #FF3366;
         text-align: center;
-        margin-bottom: 12px;
-        letter-spacing: 1.5px;
-        text-shadow: 0 0 12px rgba(255, 107, 107, 0.7);
+        margin-bottom: 15px;
+        letter-spacing: 2px;
+        text-shadow: 
+            0 0 5px #FF3366, 
+            0 0 15px #FF0055, 
+            0 0 30px #FF0033;
     }
     .main-header {
         font-size: 36px;
@@ -57,7 +56,7 @@ st.markdown("""
         background: linear-gradient(90deg, #00F2FE, #4FACFE, #00C6FF);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        text-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+        text-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
     }
     .sub-header {
         font-size: 16px;
@@ -108,29 +107,33 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(239, 68, 68, 0.15);
     }
 
-    /* Sidebar Customization with Electric Blue Neon Shine */
+    /* Sidebar Customization with Electric Blue Panaflex Glow */
     [data-testid="sidebar-content"], [data-testid="stSidebar"] {
-        background-color: #030712;
+        background-color: #030508;
         border-right: 1px solid #1F2937;
     }
     .sidebar-name {
         font-size: 22px;
         font-weight: 900;
-        color: #00F2FE;
+        color: #00FFFF;
         text-align: center;
-        text-shadow: 0 0 15px rgba(0, 242, 254, 0.9), 0 0 30px rgba(0, 242, 254, 0.5);
+        text-shadow: 
+            0 0 5px #00FFFF, 
+            0 0 10px #00FFFF, 
+            0 0 20px #0088FF, 
+            0 0 40px #0044FF;
         margin-bottom: 0px;
-        letter-spacing: 1.5px;
+        letter-spacing: 2px;
         text-transform: uppercase;
     }
     .sidebar-sub {
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
-        color: #FF6B6B;
+        color: #FF3366;
         text-align: center;
         margin-top: -2px;
         margin-bottom: 15px;
-        text-shadow: 0 0 8px rgba(255, 107, 107, 0.6);
+        text-shadow: 0 0 8px #FF3366, 0 0 15px #FF0033;
     }
 
     /* Streamlit Overrides for Text Visibility */
@@ -196,7 +199,7 @@ def load_sample_reviews():
 
 demo_options = load_sample_reviews()
 
-# --- Sidebar Control Center with Blue Neon Shine Name ---
+# --- Sidebar Control Center with Panaflex Glow Name ---
 st.sidebar.markdown('<p class="sidebar-name">Afsah Arshad</p>', unsafe_allow_html=True)
 st.sidebar.markdown('<p class="sidebar-sub">A.I Practitioner Professional</p>', unsafe_allow_html=True)
 st.sidebar.markdown("---")
@@ -294,17 +297,11 @@ if nav_mode == "🔍 Live Review Inference & XAI":
         st.metric(label="Corpus Coverage", value="140K+ Rows")
         
         st.markdown("---")
-        st.markdown("#### 🍩 Sentiment Distribution Donut Chart")
+        st.markdown("#### 🍩 Sentiment Share Distribution")
         donut_df = pd.DataFrame({
-            "Sentiment": ["Positive", "Neutral", "Negative"],
-            "Share": [78, 14, 8]
-        })
-        if PLOTLY_AVAILABLE:
-            fig_donut = px.pie(donut_df, names="Sentiment", values="Share", hole=0.5, color_discrete_sequence=["#00F2FE", "#F6E05E", "#EF4444"])
-            fig_donut.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#FFFFFF", margin=dict(t=10, b=10, l=10, r=10), height=220)
-            st.plotly_chart(fig_donut, use_container_width=True)
-        else:
-            st.bar_chart(donut_df.set_index("Sentiment"))
+            "Share (%)": [78, 14, 8]
+        }, index=["Positive", "Neutral", "Negative"])
+        st.bar_chart(donut_df)
 
 # ==========================================
 # MODE 2: CONFUSION MATRIX & DECISION DASHBOARD
@@ -325,43 +322,22 @@ elif nav_mode == "📈 Confusion Matrix & Decision Dashboard":
     col_c1, col_c2 = st.columns(2)
     
     with col_c1:
-        st.markdown("#### 🔢 Confusion Matrix Heatmap")
+        st.markdown("#### 🔢 Confusion Matrix Heatmap Table")
         cm_data = np.array([
             [673, 112, 299],
             [152, 556, 477],
             [321, 158, 23316]
         ])
         labels = ["Negative", "Neutral", "Positive"]
-        
-        if PLOTLY_AVAILABLE:
-            fig_cm = px.imshow(
-                cm_data,
-                labels=dict(x="Predicted Class", y="Actual Class", color="Count"),
-                x=labels,
-                y=labels,
-                text_auto=True,
-                color_continuous_scale="Blues"
-            )
-            fig_cm.update_layout(
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-                font_color="#FFFFFF",
-                margin=dict(t=20, b=20, l=20, r=20),
-                height=320
-            )
-            st.plotly_chart(fig_cm, use_container_width=True)
-        else:
-            cm_df = pd.DataFrame(cm_data, index=labels, columns=labels)
-            st.dataframe(cm_df, use_container_width=True)
-            
+        cm_df = pd.DataFrame(cm_data, index=labels, columns=labels)
+        st.dataframe(cm_df, use_container_width=True)
         st.info("💡 **Reading Guide**: High concentration on the bottom-right diagonal confirms exceptional detection of positive course reviews.")
 
     with col_c2:
         st.markdown("#### 📊 Per-Class F1-Score Reliability")
         perf_df = pd.DataFrame({
-            "Sentiment Class": ["Negative", "Neutral", "Positive"],
             "F1-Score": [0.74, 0.68, 0.94]
-        }).set_index("Sentiment Class")
+        }, index=["Negative", "Neutral", "Positive"])
         st.bar_chart(perf_df)
 
     st.markdown("---")
@@ -387,9 +363,8 @@ elif nav_mode == "📈 Confusion Matrix & Decision Dashboard":
 
     st.markdown("#### 📉 Classification Report Metrics Distribution Across Sentiments")
     metrics_dist = pd.DataFrame({
-        "Metric Type": ["Precision", "Recall", "F1-Score", "Support Accuracy"],
         "Score Value": [0.92, 0.88, 0.91, 0.89]
-    }).set_index("Metric Type")
+    }, index=["Precision", "Recall", "F1-Score", "Support Accuracy"])
     st.line_chart(metrics_dist)
 
 # ==========================================
@@ -441,23 +416,16 @@ elif nav_mode == "🎯 Aspect-Based Sentiment Analysis":
     with col_ch1:
         st.markdown("#### 📊 Curriculum Aspect Satisfaction Bar Chart")
         aspect_chart_data = pd.DataFrame({
-            "Curriculum Aspect": ["Content Quality", "Instructor Delivery", "Pacing & Speed", "Assignments & Labs"],
             "Satisfaction Score (%)": [94.5, 96.2, 78.4, 88.9]
-        }).set_index("Curriculum Aspect")
+        }, index=["Content Quality", "Instructor Delivery", "Pacing & Speed", "Assignments & Labs"])
         st.bar_chart(aspect_chart_data)
 
     with col_ch2:
-        st.markdown("#### 🍩 Aspect Proportion Donut Chart")
-        aspect_donut_df = pd.DataFrame({
-            "Aspect": ["Content Quality", "Instructor Delivery", "Pacing & Speed", "Assignments & Labs"],
+        st.markdown("#### 🍩 Aspect Weight Distribution")
+        aspect_weight_df = pd.DataFrame({
             "Weight": [30, 35, 15, 20]
-        })
-        if PLOTLY_AVAILABLE:
-            fig_aspect_donut = px.pie(aspect_donut_df, names="Aspect", values="Weight", hole=0.5, color_discrete_sequence=["#00F2FE", "#4FACFE", "#F6E05E", "#EF4444"])
-            fig_aspect_donut.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font_color="#FFFFFF", margin=dict(t=10, b=10, l=10, r=10), height=300)
-            st.plotly_chart(fig_aspect_donut, use_container_width=True)
-        else:
-            st.bar_chart(aspect_donut_df.set_index("Aspect"))
+        }, index=["Content Quality", "Instructor Delivery", "Pacing & Speed", "Assignments & Labs"])
+        st.bar_chart(aspect_weight_df)
 
 # ==========================================
 # MODE 4: BATCH CSV PROCESSING
