@@ -7,70 +7,110 @@ from aspect_analyzer import extract_aspects
 # --- Page Configuration ---
 st.set_page_config(
     page_title="Customer Feedback Sentiment Analyzer",
-    page_icon="📊",
+    page_icon="⚡",
     layout="wide"
 )
 
-# --- Custom High-Fi Looker Studio CSS Styling ---
+# --- Custom Ultra-Modern Dark Cinematic CSS Styling ---
 st.markdown("""
     <style>
-    .main-header {
-        font-size: 32px;
-        font-weight: 800;
-        color: #1A365D;
-        text-align: center;
-        margin-bottom: 5px;
+    /* Main Background & Global Text */
+    .stApp {
+        background-color: #0B0F19;
+        color: #F3F4F6;
     }
+    
+    /* Top Header Branding */
     .author-name-top {
-        font-size: 24px;
-        font-weight: 800;
-        color: #D69E2E;
+        font-size: 28px;
+        font-weight: 900;
+        color: #F6E05E;
         text-align: center;
-        margin-bottom: 2px;
+        margin-bottom: 0px;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 2px;
+        text-shadow: 0 0 20px rgba(246, 224, 94, 0.4);
     }
     .author-sub-top {
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 700;
-        color: #E53E3E;
+        color: #FEB2B2;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
+        letter-spacing: 1px;
+    }
+    .main-header {
+        font-size: 34px;
+        font-weight: 800;
+        color: #FFFFFF;
+        text-align: center;
+        margin-bottom: 5px;
+        background: linear-gradient(90deg, #63B3ED, #9F7AEA, #ED64A6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
     .sub-header {
-        font-size: 16px;
-        font-weight: 500;
-        color: #4A5568;
+        font-size: 15px;
+        font-weight: 400;
+        color: #9CA3AF;
         text-align: center;
-        margin-bottom: 10px;
+        margin-bottom: 25px;
     }
+
+    /* Cards & Containers */
     .aspect-card {
-        background-color: #F7FAFC;
-        border: 1px solid #E2E8F0;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 10px;
+        background: linear-gradient(135deg, #161E2E 0%, #1F2937 100%);
+        border: 1px solid #374151;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     }
     .insight-card {
-        background-color: #EBF8FF;
-        border-left: 4px solid #3182CE;
-        padding: 15px;
-        border-radius: 4px;
+        background: linear-gradient(135deg, #1A202C 0%, #1E3A8A 100%);
+        border-left: 5px solid #3B82F6;
+        border-top: 1px solid #374151;
+        border-right: 1px solid #374151;
+        border-bottom: 1px solid #374151;
+        padding: 20px;
+        border-radius: 10px;
         margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.15);
     }
     .action-card {
-        background-color: #FFF5F5;
-        border-left: 4px solid #E53E3E;
-        padding: 15px;
-        border-radius: 4px;
+        background: linear-gradient(135deg, #1A202C 0%, #7F1D1D 100%);
+        border-left: 5px solid #EF4444;
+        border-top: 1px solid #374151;
+        border-right: 1px solid #374151;
+        border-bottom: 1px solid #374151;
+        padding: 20px;
+        border-radius: 10px;
         margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
     }
+
+    /* Sidebar Customization */
+    [data-testid="stSidebar"] {
+        background-color: #07090E;
+        border-right: 1px solid #1F2937;
+    }
+
+    /* Metric Cards Styling */
+    [data-testid="stMetricValue"] {
+        color: #63B3ED !important;
+        font-weight: 800 !important;
+    }
+    [data-testid="stMetricLabel"] {
+        color: #9CA3AF !important;
+    }
+
+    /* Footer */
     .university-banner {
         text-align: center;
-        font-size: 12px;
-        color: #718096;
-        margin-top: 30px;
-        letter-spacing: 1px;
+        font-size: 13px;
+        color: #6B7280;
+        margin-top: 40px;
+        letter-spacing: 1.5px;
         text-transform: uppercase;
     }
     </style>
@@ -79,8 +119,8 @@ st.markdown("""
 # --- Header & Professional Branding ---
 st.markdown('<p class="author-name-top">Afsah Arshad</p>', unsafe_allow_html=True)
 st.markdown('<p class="author-sub-top">Certified Artificial Intelligence Practitioner Professional</p>', unsafe_allow_html=True)
-st.markdown('<p class="main-header"><b>Customer Feedback & Aspect-Based Sentiment Analyzer</b></p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Advanced Multi-Model NLP & Looker Studio Precision Intelligence Platform</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-header">Customer Feedback Sentiment Analyzer</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-header">Advanced Multi-Model NLP & Aspect-Based Sentiment Intelligence Platform</p>', unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -113,8 +153,8 @@ def load_sample_reviews():
 demo_options = load_sample_reviews()
 
 # --- Sidebar Control Center ---
-st.sidebar.markdown("### Afsah Arshad")
-st.sidebar.markdown("<p style='color: #E53E3E; font-weight: 600; margin-top: -15px;'>A.I Practitioner Professional</p>", unsafe_allow_html=True)
+st.sidebar.markdown("<h3 style='color: #F6E05E; text-align: center;'>Afsah Arshad</h3>", unsafe_allow_html=True)
+st.sidebar.markdown("<p style='color: #FEB2B2; font-weight: 600; text-align: center; margin-top: -15px;'>A.I Practitioner Professional</p>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
 st.sidebar.title("⚙️ Studio Navigation")
@@ -362,4 +402,4 @@ elif nav_mode == "📁 Batch CSV Processing":
 
 # --- Footer ---
 st.markdown("---")
-st.markdown('<p class="university-banner">Academic & Research Intelligence Platform • Afsah Arshad</p>', unsafe_allow_html=True)
+st.markdown('<p class="university-banner">Advanced AI Research Platform • Afsah Arshad</p>', unsafe_allow_html=True)
