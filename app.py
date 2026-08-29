@@ -458,4 +458,68 @@ elif nav_mode == "🎯 Aspect-Based Sentiment Analysis":
         fig_donut_aspect = px.pie(
             aspect_weight_df, names="Aspect", values="Weight", hole=0.55, template="plotly_dark"
         )
-        fig_donut_aspect.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10
+        fig_donut_aspect.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10), showlegend=True)
+        st.plotly_chart(fig_donut_aspect, use_container_width=True)
+
+# ==========================================
+# MODE 4: BATCH CSV PROCESSING (Optimized for 140K+ Rows)
+# ==========================================
+elif nav_mode == "📁 Batch CSV Processing":
+    st.subheader("📂 Bulk Course Review Dataset Batch Processor (140K+ Rows)")
+    st.write("Upload your full CSV file. The engine will process large-scale batches efficiently with live progress tracking.")
+
+    uploaded_file = st.file_uploader("Upload Full Dataset CSV", type=["csv"])
+    if uploaded_file is not None:
+        with st.spinner("Loading dataset into memory..."):
+            batch_df = pd.read_csv(uploaded_file)
+            
+        st.success(f"Dataset successfully loaded! Total rows to process: **{len(batch_df):,}**")
+        st.dataframe(batch_df.head(3), use_container_width=True)
+
+        if st.button("⚡ Run Full Batch Inference", type="primary"):
+            if "Review" in batch_df.columns and vectorizer and model:
+                # Progress bar and chunking to prevent memory overload for 140k+ rows
+                chunk_size = 20000
+                total_rows = len(batch_df)
+                predictions = []
+                
+                progress_bar = st.progress(0)
+                status_text = st.empty()
+                
+                try:
+                    for i in range(0, total_rows, chunk_size):
+                        end_idx = min(i + chunk_size, total_rows)
+                        status_text.text(f"Processing rows {i:,} to {end_idx:,} of {total_rows:,}...")
+                        
+                        # Extract chunk and predict
+                        chunk = batch_df["Review"].iloc[i:end_idx].astype(str)
+                        X_chunk = vectorizer.transform(chunk)
+                        preds_chunk = model.predict(X_chunk)
+                        predictions.extend(preds_chunk)
+                        
+                        # Update progress bar
+                        progress_bar.progress(int((end_idx / total_rows) * 100))
+                    
+                    batch_df["Predicted_Sentiment"] = predictions
+                    status_text.success("🎉 Full Batch Classification Complete!")
+                    st.balloons()
+                    
+                    st.markdown("#### 🔍 Preview of Labeled Results")
+                    st.dataframe(batch_df.head(10), use_container_width=True)
+                    
+                    # Download button for full results
+                    csv_data = batch_df.to_csv(index=False).encode('utf-8')
+                    st.download_button(
+                        label="📥 Download Complete Processed CSV (140K+ Rows)",
+                        data=csv_data,
+                        file_name="fully_labeled_course_reviews.csv",
+                        mime="text/csv"
+                    )
+                except Exception as e:
+                    st.error(f"An error occurred during batch processing: {e}")
+            else:
+                st.error("Uploaded CSV must contain a 'Review' column matching the dataset schema.")
+
+# --- Footer ---
+st.markdown("---")
+st.markdown('<p class="university-banner">Advanced AI Research Platform • Afsah Arshad</p>', unsafe_allow_html=True)
