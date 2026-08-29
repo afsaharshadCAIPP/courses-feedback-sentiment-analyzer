@@ -458,40 +458,4 @@ elif nav_mode == "🎯 Aspect-Based Sentiment Analysis":
         fig_donut_aspect = px.pie(
             aspect_weight_df, names="Aspect", values="Weight", hole=0.55, template="plotly_dark"
         )
-        fig_donut_aspect.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10), showlegend=True)
-        st.plotly_chart(fig_donut_aspect, use_container_width=True)
-
-# ==========================================
-# MODE 4: BATCH CSV PROCESSING
-# ==========================================
-elif nav_mode == "📁 Batch CSV Processing":
-    st.subheader("📂 Bulk Course Review Dataset Batch Processor")
-    st.write("Upload a CSV file containing a review column to run bulk inference and generate an automated feedback summary report.")
-
-    uploaded_file = st.file_uploader("Upload CSV File", type=["csv"])
-    if uploaded_file is not None:
-        batch_df = pd.read_csv(uploaded_file)
-        st.write(f"Dataset successfully loaded! Total rows: {len(batch_df)}")
-        st.dataframe(batch_df.head(5), use_container_width=True)
-
-        if st.button("⚡ Run Batch Inference"):
-            with st.spinner("Processing batch predictions..."):
-                if "Review" in batch_df.columns and vectorizer and model:
-                    preds = model.predict(vectorizer.transform(batch_df["Review"].astype(str)))
-                    batch_df["Predicted_Sentiment"] = preds
-                    st.success("Batch classification complete!")
-                    st.dataframe(batch_df.head(10), use_container_width=True)
-                    
-                    csv_data = batch_df.to_csv(index=False).encode('utf-8')
-                    st.download_button(
-                        label="📥 Download Processed Results CSV",
-                        data=csv_data,
-                        file_name="processed_feedback_results.csv",
-                        mime="text/csv"
-                    )
-                else:
-                    st.error("Uploaded CSV must contain a 'Review' column matching the dataset schema.")
-
-# --- Footer ---
-st.markdown("---")
-st.markdown('<p class="university-banner">Advanced AI Research Platform • Afsah Arshad</p>', unsafe_allow_html=True)
+        fig_donut_aspect.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10
