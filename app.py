@@ -21,36 +21,40 @@ st.markdown("""
         color: #F8FAFC;
     }
     
-    /* Authentic Panaflex Night Neon Billboard Author Title with Intense Glow */
+    /* Authentic Panaflex Night Neon Billboard Author Title: GOLDEN GLOW */
     .author-name-top {
         font-size: 52px;
         font-weight: 900;
-        color: #FFFFFF;
+        color: #FACC15; /* Golden Yellow */
         text-align: center;
         margin-bottom: 0px;
         text-transform: uppercase;
         letter-spacing: 5px;
         text-shadow: 
-            0 0 5px #FFFFFF, 
-            0 0 10px #38BDF8, 
-            0 0 20px #38BDF8, 
-            0 0 40px #0284C7, 
-            0 0 80px #0284C7, 
-            0 0 120px #0369A1;
+            0 0 5px #FEF08A, 
+            0 0 10px #EAB308, 
+            0 0 20px #CA8A04, 
+            0 0 40px #A16207, 
+            0 0 80px #854D0E, 
+            0 0 120px #713F12;
     }
+    
+    /* Subtitle: EMERALD GREEN GLOW */
     .author-sub-top {
         font-size: 16px;
         font-weight: 700;
-        color: #E0F2FE;
+        color: #34D399; /* Emerald Green */
         text-align: center;
         margin-top: 5px;
         margin-bottom: 20px;
         letter-spacing: 3px;
         text-shadow: 
-            0 0 5px #38BDF8, 
-            0 0 15px rgba(56, 189, 248, 0.8), 
-            0 0 30px rgba(2, 132, 199, 0.6);
+            0 0 5px #A7F3D0, 
+            0 0 15px rgba(52, 211, 153, 0.9), 
+            0 0 30px rgba(16, 185, 129, 0.7),
+            0 0 50px rgba(5, 150, 105, 0.5);
     }
+    
     .main-header {
         font-size: 36px;
         font-weight: 800;
@@ -118,9 +122,9 @@ st.markdown("""
     .sidebar-name {
         font-size: 22px;
         font-weight: 900;
-        color: #38BDF8;
+        color: #FACC15;
         text-align: center;
-        text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+        text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
         margin-bottom: 0px;
         letter-spacing: 2px;
         text-transform: uppercase;
@@ -128,10 +132,11 @@ st.markdown("""
     .sidebar-sub {
         font-size: 12px;
         font-weight: 700;
-        color: #818CF8;
+        color: #34D399;
         text-align: center;
         margin-top: -2px;
         margin-bottom: 15px;
+        text-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
     }
 
     /* Streamlit Overrides for Text Visibility */
@@ -289,7 +294,7 @@ if nav_mode == "🔍 Live Review Inference & XAI":
                     })
                     fig_shap = px.bar(
                         shap_df, x="Word", y="Impact Score", color="Impact Score",
-                        color_continuous_scale="Blues", template="plotly_dark"
+                        color_continuous_scale="Viridis", template="plotly_dark"
                     )
                     fig_shap.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10))
                     st.plotly_chart(fig_shap, use_container_width=True)
@@ -308,7 +313,7 @@ if nav_mode == "🔍 Live Review Inference & XAI":
         })
         fig_donut = px.pie(
             donut_df, names="Sentiment", values="Share", hole=0.55,
-            color_discrete_sequence=["#38BDF8", "#818CF8", "#F43F5E"], template="plotly_dark"
+            color_discrete_sequence=["#FACC15", "#34D399", "#F43F5E"], template="plotly_dark"
         )
         fig_donut.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10), showlegend=True)
         st.plotly_chart(fig_donut, use_container_width=True)
@@ -345,7 +350,7 @@ elif nav_mode == "📈 Confusion Matrix & Decision Dashboard":
         # Graphical Heatmap Chart
         fig_cm = px.imshow(
             cm_df, text_auto=True, aspect="auto",
-            color_continuous_scale="Blues", template="plotly_dark",
+            color_continuous_scale="YlOrBr", template="plotly_dark",
             labels=dict(x="Predicted", y="Actual", color="Count")
         )
         fig_cm.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10))
@@ -361,7 +366,7 @@ elif nav_mode == "📈 Confusion Matrix & Decision Dashboard":
         })
         fig_f1 = px.bar(
             perf_df, x="Sentiment", y="F1-Score", color="F1-Score",
-            color_continuous_scale="Blues", template="plotly_dark"
+            color_continuous_scale="Viridis", template="plotly_dark"
         )
         fig_f1.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10))
         st.plotly_chart(fig_f1, use_container_width=True)
@@ -441,7 +446,7 @@ elif nav_mode == "🎯 Aspect-Based Sentiment Analysis":
         })
         fig_aspect = px.bar(
             aspect_chart_data, x="Aspect", y="Satisfaction Score (%)", color="Satisfaction Score (%)",
-            color_continuous_scale="Blues", template="plotly_dark"
+            color_continuous_scale="Viridis", template="plotly_dark"
         )
         fig_aspect.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10))
         st.plotly_chart(fig_aspect, use_container_width=True)
@@ -454,7 +459,7 @@ elif nav_mode == "🎯 Aspect-Based Sentiment Analysis":
         })
         fig_donut_aspect = px.pie(
             aspect_weight_df, names="Aspect", values="Weight", hole=0.55, template="plotly_dark",
-            color_discrete_sequence=["#38BDF8", "#818CF8", "#C084FC", "#34D399"]
+            color_discrete_sequence=["#FACC15", "#34D399", "#38BDF8", "#C084FC"]
         )
         fig_donut_aspect.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10), showlegend=True)
         st.plotly_chart(fig_donut_aspect, use_container_width=True)
@@ -557,4 +562,4 @@ elif nav_mode == "📁 Batch CSV Processing":
 
 # --- Footer ---
 st.markdown("---")
-st.markdown('<p class="university-banner">Advanced AI Research Platform • Afsah Arshad</p>', unsafe_allow_html=True)
+st.markdown('<p class="university-banner">Advanced AI Research Platform • Afsah Arshad</p>', unsafe_output_container=True if 'unsafe_allow_html' in locals() else True, unsafe_allow_html=True)
