@@ -12,117 +12,107 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- Custom Ultra-Modern Panaflex Night Neon CSS Styling ---
+# --- Custom Deep Midnight Blue & Slate UI Styling ---
 st.markdown("""
     <style>
     /* Main Background & Global Text Clarity */
     .stApp {
-        background-color: #05070B;
+        background-color: #030712;
         color: #F8FAFC;
     }
     
-    /* Top Header Branding with Authentic Panaflex Night Neon Glow */
+    /* Top Header Branding with Sophisticated Ice Blue Glow */
     .author-name-top {
         font-size: 34px;
         font-weight: 900;
-        color: #FFF033;
+        color: #38BDF8;
         text-align: center;
         margin-bottom: 0px;
         text-transform: uppercase;
         letter-spacing: 3px;
         text-shadow: 
-            0 0 5px #FFF033, 
-            0 0 10px #FFF033, 
-            0 0 20px #FFD700, 
-            0 0 40px #FF8C00, 
-            0 0 80px #FF4500;
+            0 0 10px rgba(56, 189, 248, 0.5), 
+            0 0 20px rgba(56, 189, 248, 0.3);
     }
     .author-sub-top {
         font-size: 15px;
         font-weight: 700;
-        color: #FF3366;
+        color: #818CF8;
         text-align: center;
         margin-bottom: 15px;
         letter-spacing: 2px;
-        text-shadow: 
-            0 0 5px #FF3366, 
-            0 0 15px #FF0055, 
-            0 0 30px #FF0033;
+        text-shadow: 0 0 10px rgba(129, 140, 248, 0.4);
     }
     .main-header {
         font-size: 36px;
         font-weight: 800;
         text-align: center;
         margin-bottom: 5px;
-        background: linear-gradient(90deg, #00F2FE, #4FACFE, #00C6FF);
+        background: linear-gradient(90deg, #38BDF8, #818CF8, #C084FC);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        text-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        text-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
     }
     .sub-header {
         font-size: 16px;
         font-weight: 500;
-        color: #CBD5E1;
+        color: #94A3B8;
         text-align: center;
         margin-bottom: 25px;
     }
 
     /* Fix Text Area Input Visibility */
     .stTextArea textarea {
-        background-color: #111827 !important;
+        background-color: #0B0F19 !important;
         color: #FFFFFF !important;
-        border: 1px solid #00F2FE !important;
+        border: 1px solid #38BDF8 !important;
         border-radius: 8px;
     }
 
     /* Infographic Card Design */
     .aspect-card {
-        background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
-        border: 1px solid #374151;
-        border-left: 4px solid #00F2FE;
+        background: linear-gradient(135deg, #0B0F19 0%, #111827 100%);
+        border: 1px solid #1E293B;
+        border-left: 4px solid #38BDF8;
         padding: 20px;
         border-radius: 10px;
         margin-bottom: 15px;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
     }
     .insight-card {
-        background: linear-gradient(135deg, #0F172A 100%, #1E3A8A 100%);
-        border-left: 5px solid #00F2FE;
-        border-top: 1px solid #334155;
-        border-right: 1px solid #334155;
-        border-bottom: 1px solid #334155;
+        background: linear-gradient(135deg, #0B0F19 100%, #1E293B 100%);
+        border-left: 5px solid #38BDF8;
+        border-top: 1px solid #1E293B;
+        border-right: 1px solid #1E293B;
+        border-bottom: 1px solid #1E293B;
         padding: 20px;
         border-radius: 10px;
         margin-bottom: 15px;
-        box-shadow: 0 6px 20px rgba(0, 242, 254, 0.15);
+        box-shadow: 0 6px 20px rgba(56, 189, 248, 0.1);
     }
     .action-card {
-        background: linear-gradient(135deg, #0F172A 100%, #7F1D1D 100%);
-        border-left: 5px solid #EF4444;
-        border-top: 1px solid #334155;
-        border-right: 1px solid #334155;
-        border-bottom: 1px solid #334155;
+        background: linear-gradient(135deg, #0B0F19 100%, #450A0A 100%);
+        border-left: 5px solid #F43F5E;
+        border-top: 1px solid #1E293B;
+        border-right: 1px solid #1E293B;
+        border-bottom: 1px solid #1E293B;
         padding: 20px;
         border-radius: 10px;
         margin-bottom: 15px;
-        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.15);
+        box-shadow: 0 6px 20px rgba(244, 63, 94, 0.15);
     }
 
-    /* Sidebar Customization with Electric Blue Panaflex Glow */
+    /* Sidebar Customization */
     [data-testid="sidebar-content"], [data-testid="stSidebar"] {
-        background-color: #030508;
-        border-right: 1px solid #1F2937;
+        background-color: #050B14;
+        border-right: 1px solid #1E293B;
     }
     .sidebar-name {
         font-size: 22px;
         font-weight: 900;
-        color: #00FFFF;
+        color: #38BDF8;
         text-align: center;
-        text-shadow: 
-            0 0 5px #00FFFF, 
-            0 0 10px #00FFFF, 
-            0 0 20px #0088FF, 
-            0 0 40px #0044FF;
+        text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
         margin-bottom: 0px;
         letter-spacing: 2px;
         text-transform: uppercase;
@@ -130,11 +120,10 @@ st.markdown("""
     .sidebar-sub {
         font-size: 12px;
         font-weight: 700;
-        color: #FF3366;
+        color: #818CF8;
         text-align: center;
         margin-top: -2px;
         margin-bottom: 15px;
-        text-shadow: 0 0 8px #FF3366, 0 0 15px #FF0033;
     }
 
     /* Streamlit Overrides for Text Visibility */
@@ -142,11 +131,11 @@ st.markdown("""
         color: #F1F5F9 !important;
     }
     
-    /* Metric Cards Brightening */
+    /* Metric Cards Styling */
     [data-testid="stMetricValue"] {
-        color: #00F2FE !important;
+        color: #38BDF8 !important;
         font-weight: 900 !important;
-        text-shadow: 0 0 12px rgba(0, 242, 254, 0.5);
+        text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
     }
     [data-testid="stMetricLabel"] {
         color: #94A3B8 !important;
@@ -200,7 +189,7 @@ def load_sample_reviews():
 
 demo_options = load_sample_reviews()
 
-# --- Sidebar Control Center with Panaflex Glow Name ---
+# --- Sidebar Control Center ---
 st.sidebar.markdown('<p class="sidebar-name">Afsah Arshad</p>', unsafe_allow_html=True)
 st.sidebar.markdown('<p class="sidebar-sub">A.I Practitioner Professional</p>', unsafe_allow_html=True)
 st.sidebar.markdown("---")
@@ -282,7 +271,7 @@ if nav_mode == "🔍 Live Review Inference & XAI":
                 else:
                     st.info("No specific domain keywords matched; semantic fallback engaged.")
 
-                # SHAP / Feature Attribution Chart using Plotly
+                # SHAP / Feature Attribution Chart using Plotly (Midnight Theme)
                 st.markdown("#### 🧪 Explainable AI (SHAP Feature Impact)")
                 words = user_review.split()[:6]
                 if words:
@@ -292,9 +281,9 @@ if nav_mode == "🔍 Live Review Inference & XAI":
                     })
                     fig_shap = px.bar(
                         shap_df, x="Word", y="Impact Score", color="Impact Score",
-                        color_continuous_scale="RdBu", template="plotly_dark"
+                        color_continuous_scale="Blues", template="plotly_dark"
                     )
-                    fig_shap.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10))
+                    fig_shap.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10))
                     st.plotly_chart(fig_shap, use_container_width=True)
 
     with col2:
@@ -311,9 +300,9 @@ if nav_mode == "🔍 Live Review Inference & XAI":
         })
         fig_donut = px.pie(
             donut_df, names="Sentiment", values="Share", hole=0.55,
-            color_discrete_sequence=["#00F2FE", "#4FACFE", "#FF3366"], template="plotly_dark"
+            color_discrete_sequence=["#38BDF8", "#818CF8", "#F43F5E"], template="plotly_dark"
         )
-        fig_donut.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10), showlegend=True)
+        fig_donut.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10), showlegend=True)
         st.plotly_chart(fig_donut, use_container_width=True)
 
 # ==========================================
@@ -345,13 +334,13 @@ elif nav_mode == "📈 Confusion Matrix & Decision Dashboard":
         cm_df = pd.DataFrame(cm_data, index=labels, columns=labels)
         st.dataframe(cm_df, use_container_width=True)
         
-        # Graphical Heatmap Chart Added Back Successfully
+        # Graphical Heatmap Chart
         fig_cm = px.imshow(
             cm_df, text_auto=True, aspect="auto",
             color_continuous_scale="Blues", template="plotly_dark",
             labels=dict(x="Predicted", y="Actual", color="Count")
         )
-        fig_cm.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10))
+        fig_cm.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10))
         st.plotly_chart(fig_cm, use_container_width=True)
         
         st.info("💡 **Reading Guide**: High concentration on the bottom-right diagonal confirms exceptional detection of positive course reviews.")
@@ -364,9 +353,9 @@ elif nav_mode == "📈 Confusion Matrix & Decision Dashboard":
         })
         fig_f1 = px.bar(
             perf_df, x="Sentiment", y="F1-Score", color="F1-Score",
-            color_continuous_scale="Viridis", template="plotly_dark"
+            color_continuous_scale="Blues", template="plotly_dark"
         )
-        fig_f1.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10))
+        fig_f1.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10))
         st.plotly_chart(fig_f1, use_container_width=True)
 
     st.markdown("---")
@@ -444,9 +433,9 @@ elif nav_mode == "🎯 Aspect-Based Sentiment Analysis":
         })
         fig_aspect = px.bar(
             aspect_chart_data, x="Aspect", y="Satisfaction Score (%)", color="Satisfaction Score (%)",
-            color_continuous_scale="Teal", template="plotly_dark"
+            color_continuous_scale="Blues", template="plotly_dark"
         )
-        fig_aspect.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10))
+        fig_aspect.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10))
         st.plotly_chart(fig_aspect, use_container_width=True)
 
     with col_ch2:
@@ -456,13 +445,14 @@ elif nav_mode == "🎯 Aspect-Based Sentiment Analysis":
             "Weight": [30, 35, 15, 20]
         })
         fig_donut_aspect = px.pie(
-            aspect_weight_df, names="Aspect", values="Weight", hole=0.55, template="plotly_dark"
+            aspect_weight_df, names="Aspect", values="Weight", hole=0.55, template="plotly_dark",
+            color_discrete_sequence=["#38BDF8", "#818CF8", "#C084FC", "#34D399"]
         )
-        fig_donut_aspect.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10), showlegend=True)
+        fig_donut_aspect.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10), showlegend=True)
         st.plotly_chart(fig_donut_aspect, use_container_width=True)
 
 # ==========================================
-# MODE 4: BATCH CSV PROCESSING (Optimized & Filterable Tabs)
+# MODE 4: BATCH CSV PROCESSING
 # ==========================================
 elif nav_mode == "📁 Batch CSV Processing":
     st.subheader("📂 Bulk Course Review Dataset Batch Processor (140K+ Rows)")
@@ -478,7 +468,6 @@ elif nav_mode == "📁 Batch CSV Processing":
 
         if st.button("⚡ Run Full Batch Inference", type="primary"):
             if "Review" in batch_df.columns and vectorizer and model:
-                # Handle missing/NaN values safely by filling with empty string
                 batch_df["Review"] = batch_df["Review"].fillna("")
                 
                 chunk_size = 20000
@@ -504,7 +493,6 @@ elif nav_mode == "📁 Batch CSV Processing":
                     status_text.success("🎉 Full Batch Classification Complete!")
                     st.balloons()
                     
-                    # Sentiment Distribution Metrics Summary
                     st.markdown("---")
                     st.subheader("📊 Batch Processing Summary & Sentiment Breakdown")
                     sentiment_counts = batch_df["Predicted_Sentiment"].value_counts()
@@ -517,7 +505,6 @@ elif nav_mode == "📁 Batch CSV Processing":
                     st.markdown("---")
                     st.markdown("#### 🔍 Filtered Labeled Results Preview")
                     
-                    # Tabs to view Negative, Positive, Neutral and All Results
                     tab_neg, tab_pos, tab_neu, tab_all = st.tabs([
                         f"🔴 Negative ({sentiment_counts.get('negative', 0):,})", 
                         f"🟢 Positive ({sentiment_counts.get('positive', 0):,})", 
