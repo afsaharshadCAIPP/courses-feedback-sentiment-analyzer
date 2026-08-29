@@ -251,7 +251,7 @@ if nav_mode == "🔍 Live Review Inference & XAI":
             else:
                 with st.spinner(f"Executing pipeline via **{model_choice}**..."):
                     if vectorizer and model:
-                        X = vectorizer.transform([user_review])
+                        X = vectorizer.transform([str(user_review)])
                         pred = model.predict(X)[0]
                         probs = model.predict_proba(X)[0]
                         confidence = np.max(probs) * 100
@@ -462,7 +462,7 @@ elif nav_mode == "🎯 Aspect-Based Sentiment Analysis":
         st.plotly_chart(fig_donut_aspect, use_container_width=True)
 
 # ==========================================
-# MODE 4: BATCH CSV PROCESSING (Optimized for 140K+ Rows)
+# MODE 4: BATCH CSV PROCESSING (Optimized & NaN Proof)
 # ==========================================
 elif nav_mode == "📁 Batch CSV Processing":
     st.subheader("📂 Bulk Course Review Dataset Batch Processor (140K+ Rows)")
@@ -478,7 +478,9 @@ elif nav_mode == "📁 Batch CSV Processing":
 
         if st.button("⚡ Run Full Batch Inference", type="primary"):
             if "Review" in batch_df.columns and vectorizer and model:
-                # Progress bar and chunking to prevent memory overload for 140k+ rows
+                # Handle missing/NaN values safely by filling with empty string
+                batch_df["Review"] = batch_df["Review"].fillna("")
+                
                 chunk_size = 20000
                 total_rows = len(batch_df)
                 predictions = []
@@ -491,13 +493,11 @@ elif nav_mode == "📁 Batch CSV Processing":
                         end_idx = min(i + chunk_size, total_rows)
                         status_text.text(f"Processing rows {i:,} to {end_idx:,} of {total_rows:,}...")
                         
-                        # Extract chunk and predict
                         chunk = batch_df["Review"].iloc[i:end_idx].astype(str)
                         X_chunk = vectorizer.transform(chunk)
                         preds_chunk = model.predict(X_chunk)
                         predictions.extend(preds_chunk)
                         
-                        # Update progress bar
                         progress_bar.progress(int((end_idx / total_rows) * 100))
                     
                     batch_df["Predicted_Sentiment"] = predictions
@@ -507,7 +507,6 @@ elif nav_mode == "📁 Batch CSV Processing":
                     st.markdown("#### 🔍 Preview of Labeled Results")
                     st.dataframe(batch_df.head(10), use_container_width=True)
                     
-                    # Download button for full results
                     csv_data = batch_df.to_csv(index=False).encode('utf-8')
                     st.download_button(
                         label="📥 Download Complete Processed CSV (140K+ Rows)",
