@@ -462,11 +462,11 @@ elif nav_mode == "🎯 Aspect-Based Sentiment Analysis":
         st.plotly_chart(fig_donut_aspect, use_container_width=True)
 
 # ==========================================
-# MODE 4: BATCH CSV PROCESSING (Optimized & NaN Proof)
+# MODE 4: BATCH CSV PROCESSING (Optimized & Filterable Tabs)
 # ==========================================
 elif nav_mode == "📁 Batch CSV Processing":
     st.subheader("📂 Bulk Course Review Dataset Batch Processor (140K+ Rows)")
-    st.write("Upload your full CSV file. The engine will process large-scale batches efficiently with live progress tracking.")
+    st.write("Upload your full CSV file. The engine will process large-scale batches efficiently with live progress tracking and sentiment filtering.")
 
     uploaded_file = st.file_uploader("Upload Full Dataset CSV", type=["csv"])
     if uploaded_file is not None:
@@ -504,9 +504,50 @@ elif nav_mode == "📁 Batch CSV Processing":
                     status_text.success("🎉 Full Batch Classification Complete!")
                     st.balloons()
                     
-                    st.markdown("#### 🔍 Preview of Labeled Results")
-                    st.dataframe(batch_df.head(10), use_container_width=True)
+                    # Sentiment Distribution Metrics Summary
+                    st.markdown("---")
+                    st.subheader("📊 Batch Processing Summary & Sentiment Breakdown")
+                    sentiment_counts = batch_df["Predicted_Sentiment"].value_counts()
                     
+                    col_b1, col_b2, col_b3 = st.columns(3)
+                    col_b1.metric("🟢 Positive Reviews", f"{sentiment_counts.get('positive', 0):,}")
+                    col_b2.metric("🟡 Neutral Reviews", f"{sentiment_counts.get('neutral', 0):,}")
+                    col_b3.metric("🔴 Negative Reviews", f"{sentiment_counts.get('negative', 0):,}")
+
+                    st.markdown("---")
+                    st.markdown("#### 🔍 Filtered Labeled Results Preview")
+                    
+                    # Tabs to view Negative, Positive, Neutral and All Results
+                    tab_neg, tab_pos, tab_neu, tab_all = st.tabs([
+                        f"🔴 Negative ({sentiment_counts.get('negative', 0):,})", 
+                        f"🟢 Positive ({sentiment_counts.get('positive', 0):,})", 
+                        f"🟡 Neutral ({sentiment_counts.get('neutral', 0):,})", 
+                        "📂 All Results (Top 50)"
+                    ])
+                    
+                    with tab_neg:
+                        neg_df = batch_df[batch_df["Predicted_Sentiment"] == "negative"]
+                        if not neg_df.empty:
+                            st.write(f"Showing all **{len(neg_df):,}** negative reviews detected in the dataset:")
+                            st.dataframe(neg_df, use_container_width=True, height=400)
+                        else:
+                            st.info("No negative reviews found in this batch.")
+                            
+                    with tab_pos:
+                        pos_df = batch_df[batch_df["Predicted_Sentiment"] == "positive"].head(100)
+                        st.dataframe(pos_df, use_container_width=True, height=400)
+                        
+                    with tab_neu:
+                        neu_df = batch_df[batch_df["Predicted_Sentiment"] == "neutral"]
+                        if not neu_df.empty:
+                            st.dataframe(neu_df, use_container_width=True, height=400)
+                        else:
+                            st.info("No neutral reviews found.")
+                            
+                    with tab_all:
+                        st.dataframe(batch_df.head(50), use_container_width=True, height=400)
+
+                    st.markdown("---")
                     csv_data = batch_df.to_csv(index=False).encode('utf-8')
                     st.download_button(
                         label="📥 Download Complete Processed CSV (140K+ Rows)",
