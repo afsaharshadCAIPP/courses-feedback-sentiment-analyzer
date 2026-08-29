@@ -12,7 +12,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- Custom Cinematic Panaflex Night Neon Billboard UI Styling ---
+# --- Custom Panaflex Night Neon High-Definition Billboard UI Styling ---
 st.markdown("""
     <style>
     /* Main Background & Global Text Clarity */
@@ -21,7 +21,7 @@ st.markdown("""
         color: #F8FAFC;
     }
     
-    /* Cinematic Panaflex Night High-Definition Billboard Author Title */
+    /* Authentic Panaflex Night Neon Billboard Author Title with Intense Glow */
     .author-name-top {
         font-size: 52px;
         font-weight: 900;
@@ -31,23 +31,25 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 5px;
         text-shadow: 
+            0 0 5px #FFFFFF, 
             0 0 10px #38BDF8, 
             0 0 20px #38BDF8, 
             0 0 40px #0284C7, 
-            0 0 80px #0369A1, 
-            0 0 120px #0284C7;
+            0 0 80px #0284C7, 
+            0 0 120px #0369A1;
     }
     .author-sub-top {
         font-size: 16px;
         font-weight: 700;
-        color: #93C5FD;
+        color: #E0F2FE;
         text-align: center;
         margin-top: 5px;
         margin-bottom: 20px;
         letter-spacing: 3px;
         text-shadow: 
-            0 0 8px rgba(147, 197, 253, 0.6), 
-            0 0 20px rgba(56, 189, 248, 0.4);
+            0 0 5px #38BDF8, 
+            0 0 15px rgba(56, 189, 248, 0.8), 
+            0 0 30px rgba(2, 132, 199, 0.6);
     }
     .main-header {
         font-size: 36px;
