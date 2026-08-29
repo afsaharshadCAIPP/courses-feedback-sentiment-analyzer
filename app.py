@@ -335,7 +335,7 @@ elif nav_mode == "📈 Confusion Matrix & Decision Dashboard":
     col_c1, col_c2 = st.columns(2)
     
     with col_c1:
-        st.markdown("#### 🔢 Confusion Matrix Heatmap Table")
+        st.markdown("#### 🔢 Confusion Matrix Table & Heatmap Chart")
         cm_data = np.array([
             [673, 112, 299],
             [152, 556, 477],
@@ -344,6 +344,16 @@ elif nav_mode == "📈 Confusion Matrix & Decision Dashboard":
         labels = ["Negative", "Neutral", "Positive"]
         cm_df = pd.DataFrame(cm_data, index=labels, columns=labels)
         st.dataframe(cm_df, use_container_width=True)
+        
+        # Graphical Heatmap Chart Added Back Successfully
+        fig_cm = px.imshow(
+            cm_df, text_auto=True, aspect="auto",
+            color_continuous_scale="Blues", template="plotly_dark",
+            labels=dict(x="Predicted", y="Actual", color="Count")
+        )
+        fig_cm.update_layout(paper_bgcolor="#05070B", plot_bgcolor="#05070B", margin=dict(t=10, b=10, l=10, r=10))
+        st.plotly_chart(fig_cm, use_container_width=True)
+        
         st.info("💡 **Reading Guide**: High concentration on the bottom-right diagonal confirms exceptional detection of positive course reviews.")
 
     with col_c2:
