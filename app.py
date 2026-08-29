@@ -7,7 +7,7 @@ from aspect_analyzer import extract_aspects
 
 # --- Page Configuration (Streamlit Logo + Custom Title) ---
 st.set_page_config(
-    page_title="Afsah Arshad | Customer Feedback Sentiment Analyzer",
+    page_title="Afsah Arshad | Courses Feedback Sentiment Analyzer",
     page_icon="⚡",
     layout="wide"
 )
@@ -167,7 +167,7 @@ st.markdown("""
 # --- Header & Professional Branding ---
 st.markdown('<p class="author-name-top">Afsah Arshad</p>', unsafe_allow_html=True)
 st.markdown('<p class="author-sub-top">Certified Artificial Intelligence Practitioner Professional</p>', unsafe_allow_html=True)
-st.markdown('<p class="main-header">Customer Feedback Sentiment Analyzer</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-header">Courses Feedback Sentiment Analyzer</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Advanced Multi-Model NLP & Aspect-Based Sentiment Intelligence Platform</p>', unsafe_allow_html=True)
 
 st.markdown("---")
