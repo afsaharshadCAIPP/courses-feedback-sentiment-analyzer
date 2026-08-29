@@ -12,7 +12,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- Custom Deep Midnight Blue & Slate UI Styling ---
+# --- Custom Cinematic Panaflex Night Neon Billboard UI Styling ---
 st.markdown("""
     <style>
     /* Main Background & Global Text Clarity */
@@ -21,27 +21,33 @@ st.markdown("""
         color: #F8FAFC;
     }
     
-    /* Top Header Branding with Sophisticated Ice Blue Glow */
+    /* Cinematic Panaflex Night High-Definition Billboard Author Title */
     .author-name-top {
-        font-size: 34px;
+        font-size: 52px;
         font-weight: 900;
-        color: #38BDF8;
+        color: #FFFFFF;
         text-align: center;
         margin-bottom: 0px;
         text-transform: uppercase;
-        letter-spacing: 3px;
+        letter-spacing: 5px;
         text-shadow: 
-            0 0 10px rgba(56, 189, 248, 0.5), 
-            0 0 20px rgba(56, 189, 248, 0.3);
+            0 0 10px #38BDF8, 
+            0 0 20px #38BDF8, 
+            0 0 40px #0284C7, 
+            0 0 80px #0369A1, 
+            0 0 120px #0284C7;
     }
     .author-sub-top {
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 700;
-        color: #818CF8;
+        color: #93C5FD;
         text-align: center;
-        margin-bottom: 15px;
-        letter-spacing: 2px;
-        text-shadow: 0 0 10px rgba(129, 140, 248, 0.4);
+        margin-top: 5px;
+        margin-bottom: 20px;
+        letter-spacing: 3px;
+        text-shadow: 
+            0 0 8px rgba(147, 197, 253, 0.6), 
+            0 0 20px rgba(56, 189, 248, 0.4);
     }
     .main-header {
         font-size: 36px;
@@ -271,7 +277,7 @@ if nav_mode == "🔍 Live Review Inference & XAI":
                 else:
                     st.info("No specific domain keywords matched; semantic fallback engaged.")
 
-                # SHAP / Feature Attribution Chart using Plotly (Midnight Theme)
+                # SHAP / Feature Attribution Chart using Plotly
                 st.markdown("#### 🧪 Explainable AI (SHAP Feature Impact)")
                 words = user_review.split()[:6]
                 if words:
