@@ -196,14 +196,16 @@ def load_models():
 
 vectorizer, model = load_models()
 
-# --- Load Real Reviews from Dataset for Dropdown ---
+# --- Load Real Reviews from Dataset for Dropdown (Increased Quantity to 15) ---
 @st.cache_data
 def load_sample_reviews():
     try:
         df = pd.read_csv("course_reviews.csv")
         if "Review" in df.columns:
-            real_reviews = df["Review"].dropna().sample(5, random_state=42).tolist()
-            return ["-- Select Real Review from course_reviews.csv --"] + real_reviews
+            valid_reviews = df["Review"].dropna()
+            sample_size = min(15, len(valid_reviews))
+            real_reviews = valid_reviews.sample(n=sample_size).tolist()
+            return ["-- Select Real Review from course_reviews.csv (15 Options) --"] + real_reviews
     except Exception:
         pass
     return ["-- Select Real Review from course_reviews.csv --", "Dataset or Review column not found, please type manually below."]
@@ -245,7 +247,7 @@ if nav_mode == "🔍 Live Review Inference & XAI":
     with col1:
         st.subheader("📝 Single Text Review Analysis")
         
-        selected_preset = st.selectbox("📌 Choose Real Review from Dataset:", demo_options)
+        selected_preset = st.selectbox("📌 Choose Real Review from Dataset (15 Options):", demo_options)
         default_text = "" if selected_preset.startswith("--") else selected_preset
 
         user_review = st.text_area(
