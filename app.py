@@ -55,15 +55,17 @@ st.markdown("""
             0 0 50px rgba(5, 150, 105, 0.5);
     }
     
+    /* Main Topic Header: Enriched & Enlarged */
     .main-header {
-        font-size: 36px;
-        font-weight: 800;
+        font-size: 42px;
+        font-weight: 900;
         text-align: center;
         margin-bottom: 5px;
         background: linear-gradient(90deg, #38BDF8, #818CF8, #C084FC);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        text-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
+        text-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
+        letter-spacing: 2px;
     }
     .sub-header {
         font-size: 16px;
@@ -114,7 +116,7 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(244, 63, 94, 0.15);
     }
 
-    /* Sidebar Customization */
+    /* Sidebar Customization: Golden & Emerald Neon Match */
     [data-testid="sidebar-content"], [data-testid="stSidebar"] {
         background-color: #050B14;
         border-right: 1px solid #1E293B;
@@ -122,21 +124,27 @@ st.markdown("""
     .sidebar-name {
         font-size: 22px;
         font-weight: 900;
-        color: #FACC15;
+        color: #FACC15; /* Golden Yellow */
         text-align: center;
-        text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
         margin-bottom: 0px;
         letter-spacing: 2px;
         text-transform: uppercase;
+        text-shadow: 
+            0 0 5px #FEF08A, 
+            0 0 10px #EAB308, 
+            0 0 20px #CA8A04;
     }
     .sidebar-sub {
         font-size: 12px;
         font-weight: 700;
-        color: #34D399;
+        color: #34D399; /* Emerald Green */
         text-align: center;
         margin-top: -2px;
         margin-bottom: 15px;
-        text-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
+        letter-spacing: 1px;
+        text-shadow: 
+            0 0 5px #A7F3D0, 
+            0 0 12px rgba(52, 211, 153, 0.8);
     }
 
     /* Streamlit Overrides for Text Visibility */
@@ -562,4 +570,4 @@ elif nav_mode == "📁 Batch CSV Processing":
 
 # --- Footer ---
 st.markdown("---")
-st.markdown('<p class="university-banner">Advanced AI Research Platform • Afsah Arshad</p>', unsafe_output_container=True if 'unsafe_allow_html' in locals() else True, unsafe_allow_html=True)
+st.markdown('<p class="university-banner">Advanced AI Research Platform • Afsah Arshad</p>', unsafe_allow_html=True)
