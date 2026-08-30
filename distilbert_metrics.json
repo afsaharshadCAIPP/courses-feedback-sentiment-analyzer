@@ -1,0 +1,59 @@
+{
+  "model": "distilbert-base-multilingual-cased",
+  "dataset_size_after_balancing": 35035,
+  "classification_report": {
+    "negative": {
+      "precision": 0.6950261780104712,
+      "recall": 0.6531365313653137,
+      "f1-score": 0.673430564362714,
+      "support": 813.0
+    },
+    "neutral": {
+      "precision": 0.4900947459086994,
+      "recall": 0.6400449943757031,
+      "f1-score": 0.5551219512195122,
+      "support": 889.0
+    },
+    "positive": {
+      "precision": 0.9498649054338036,
+      "recall": 0.8902644907146877,
+      "f1-score": 0.9190994916485112,
+      "support": 3554.0
+    },
+    "accuracy": 0.8112633181126332,
+    "macro avg": {
+      "precision": 0.7116619431176581,
+      "recall": 0.7278153388185681,
+      "f1-score": 0.7158840024102459,
+      "support": 5256.0
+    },
+    "weighted avg": {
+      "precision": 0.8326808192060665,
+      "recall": 0.8112633181126332,
+      "f1-score": 0.8195361599657233,
+      "support": 5256.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      531,
+      244,
+      38
+    ],
+    [
+      191,
+      569,
+      129
+    ],
+    [
+      42,
+      348,
+      3164
+    ]
+  ],
+  "label_order": [
+    "negative",
+    "neutral",
+    "positive"
+  ]
+}

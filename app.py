@@ -1,8 +1,11 @@
 import pickle
+import json
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
+import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from aspect_analyzer import extract_aspects
 
 # --- Page Configuration (Streamlit Logo + Custom Title) ---
@@ -196,6 +199,93 @@ def load_models():
 
 vectorizer, model = load_models()
 
+# --- Load Fine-tuned Multilingual DistilBERT ---
+# Hosted on Hugging Face Hub (not bundled in this repo — the weights file is too large
+# for a normal GitHub upload). transformers downloads and caches it automatically the
+# first time the app runs.
+DISTILBERT_PATH = "Afsaharshad/course-sentiment-distilbert"
+
+@st.cache_resource
+def load_distilbert():
+    try:
+        tok = AutoTokenizer.from_pretrained(DISTILBERT_PATH)
+        mdl = AutoModelForSequenceClassification.from_pretrained(DISTILBERT_PATH)
+        mdl.eval()
+        return tok, mdl
+    except Exception:
+        return None, None
+
+distilbert_tokenizer, distilbert_model = load_distilbert()
+DISTILBERT_AVAILABLE = distilbert_tokenizer is not None and distilbert_model is not None
+
+TFIDF_LABELS = ["negative", "neutral", "positive"]  # matches vectorizer/model.classes_ order
+
+def predict_tfidf(text):
+    """Returns (predicted_label, prob_array_aligned_to_TFIDF_LABELS)."""
+    X = vectorizer.transform([str(text)])
+    probs = model.predict_proba(X)[0]
+    pred = TFIDF_LABELS[int(np.argmax(probs))]
+    return pred, probs
+
+def predict_distilbert(text):
+    """Returns (predicted_label, prob_array_aligned_to_TFIDF_LABELS)."""
+    inputs = distilbert_tokenizer(str(text), return_tensors="pt", truncation=True, padding=True, max_length=128)
+    with torch.no_grad():
+        logits = distilbert_model(**inputs).logits
+    probs = torch.softmax(logits, dim=-1)[0].numpy()
+    id2label = distilbert_model.config.id2label
+    # Reorder distilbert's probs into the same [negative, neutral, positive] order used elsewhere
+    ordered = np.array([probs[i] for i, lbl in sorted(id2label.items(), key=lambda kv: TFIDF_LABELS.index(kv[1]))])
+    pred = TFIDF_LABELS[int(np.argmax(ordered))]
+    return pred, ordered
+
+def run_inference(text, choice):
+    """Routes to the selected engine. Falls back to TF-IDF if DistilBERT isn't available."""
+    if choice.startswith("Multilingual DistilBERT"):
+        if DISTILBERT_AVAILABLE:
+            return predict_distilbert(text)
+        st.warning("DistilBERT model files not found — falling back to TF-IDF.")
+        return predict_tfidf(text)
+    elif choice.startswith("Combo Ensemble"):
+        tfidf_pred, tfidf_probs = predict_tfidf(text)
+        if DISTILBERT_AVAILABLE:
+            _, bert_probs = predict_distilbert(text)
+            combined = (tfidf_probs + bert_probs) / 2
+        else:
+            combined = tfidf_probs
+        pred = TFIDF_LABELS[int(np.argmax(combined))]
+        return pred, combined
+    else:
+        return predict_tfidf(text)
+
+# --- Load real evaluation metrics (no hardcoded/fabricated numbers) ---
+@st.cache_data
+def load_metrics():
+    metrics = {}
+    try:
+        with open("metrics.json") as f:
+            metrics["tfidf"] = json.load(f)
+    except Exception:
+        metrics["tfidf"] = None
+    try:
+        with open("distilbert_metrics.json") as f:
+            metrics["distilbert"] = json.load(f)
+    except Exception:
+        metrics["distilbert"] = None
+    return metrics
+
+all_metrics = load_metrics()
+
+def get_active_metrics(choice):
+    """Returns the classification_report + confusion_matrix relevant to the selected engine."""
+    if choice.startswith("Multilingual DistilBERT") and all_metrics.get("distilbert"):
+        m = all_metrics["distilbert"]
+        return m["classification_report"], m["confusion_matrix"], "DistilBERT (fine-tuned)"
+    elif all_metrics.get("tfidf"):
+        m = all_metrics["tfidf"]
+        return m["classification_report"], m["confusion_matrix"], "TF-IDF + Logistic Regression"
+    return None, None, "N/A"
+
 # --- Load Real Reviews from Dataset for Dropdown (Increased Quantity to 15) ---
 @st.cache_data
 def load_sample_reviews():
@@ -211,6 +301,14 @@ def load_sample_reviews():
     return ["-- Select Real Review from course_reviews.csv --", "Dataset or Review column not found, please type manually below."]
 
 demo_options = load_sample_reviews()
+
+@st.cache_data
+def compute_real_sentiment_distribution():
+    df = pd.read_csv("course_reviews.csv")
+    sentiment = df["Label"].apply(lambda r: "Negative" if r <= 2 else ("Neutral" if r == 3 else "Positive"))
+    return sentiment.value_counts()
+
+real_sentiment_counts = compute_real_sentiment_distribution()
 
 # --- Sidebar Control Center ---
 st.sidebar.markdown('<p class="sidebar-name">Afsah Arshad</p>', unsafe_allow_html=True)
@@ -263,9 +361,7 @@ if nav_mode == "🔍 Live Review Inference & XAI":
             else:
                 with st.spinner(f"Executing pipeline via **{model_choice}**..."):
                     if vectorizer and model:
-                        X = vectorizer.transform([str(user_review)])
-                        pred = model.predict(X)[0]
-                        probs = model.predict_proba(X)[0]
+                        pred, probs = run_inference(user_review, model_choice)
                         confidence = np.max(probs) * 100
                     else:
                         pred = "positive"
@@ -294,32 +390,47 @@ if nav_mode == "🔍 Live Review Inference & XAI":
                 else:
                     st.info("No specific domain keywords matched; semantic fallback engaged.")
 
-                # SHAP / Feature Attribution Chart using Plotly
-                st.markdown("#### 🧪 Explainable AI (SHAP Feature Impact)")
-                words = user_review.split()[:6]
-                if words:
-                    shap_df = pd.DataFrame({
-                        "Word": words,
-                        "Impact Score": np.random.uniform(-0.8, 0.9, len(words))
-                    })
+                # Real word-importance via leave-one-word-out perturbation
+                # (works for any model type — TF-IDF or DistilBERT — since it treats the
+                # model as a black box, unlike SHAP which needs model-specific integration)
+                st.markdown("#### 🧪 Explainable AI (Word Impact via Perturbation)")
+                words = user_review.split()
+                if len(words) > 1:
+                    pred_idx = TFIDF_LABELS.index(pred)
+                    base_score = probs[pred_idx]
+                    impacts = []
+                    for i in range(len(words)):
+                        perturbed = " ".join(words[:i] + words[i+1:])
+                        _, p_probs = run_inference(perturbed, model_choice)
+                        # positive impact = removing the word DROPS confidence a lot,
+                        # meaning that word was important supporting evidence
+                        impacts.append(base_score - p_probs[pred_idx])
+                    shap_df = pd.DataFrame({"Word": words, "Impact Score": impacts})
                     fig_shap = px.bar(
                         shap_df, x="Word", y="Impact Score", color="Impact Score",
                         color_continuous_scale="Viridis", template="plotly_dark"
                     )
                     fig_shap.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10))
                     st.plotly_chart(fig_shap, use_container_width=True)
+                    st.caption("Higher bars = removing that word drops the model's confidence in its prediction the most, i.e. that word mattered most.")
+                else:
+                    st.info("Enter a longer review (2+ words) to see per-word impact.")
 
     with col2:
         st.subheader("💡 Studio Metrics")
-        st.metric(label="Model Baseline F1", value="90.77%")
-        st.metric(label="Inference Latency", value="14 ms")
+        active_report, active_cm, active_model_name = get_active_metrics(model_choice)
+        if active_report:
+            macro_f1 = active_report["macro avg"]["f1-score"] * 100
+            st.metric(label=f"Macro F1 ({active_model_name})", value=f"{macro_f1:.2f}%")
+        else:
+            st.metric(label="Macro F1", value="N/A")
         st.metric(label="Corpus Coverage", value="140K+ Rows")
         
         st.markdown("---")
         st.markdown("#### 🍩 Sentiment Share Distribution")
         donut_df = pd.DataFrame({
-            "Sentiment": ["Positive", "Neutral", "Negative"],
-            "Share": [78, 14, 8]
+            "Sentiment": list(real_sentiment_counts.index),
+            "Share": list(real_sentiment_counts.values)
         })
         fig_donut = px.pie(
             donut_df, names="Sentiment", values="Share", hole=0.55,
@@ -334,73 +445,80 @@ if nav_mode == "🔍 Live Review Inference & XAI":
 elif nav_mode == "📈 Confusion Matrix & Decision Dashboard":
     st.subheader("📈 Confusion Matrix & Strategic Decision Dashboard")
     st.write("Comprehensive classification evaluation designed for immediate executive decision-making, identifying model reliability and high-priority intervention areas.")
+    st.caption(f"Showing real held-out test-set metrics for: **{model_choice}**")
 
-    # Top KPI Metrics for Quick Decision Making
-    col_m1, col_m2, col_m3, col_m4 = st.columns(4)
-    col_m1.metric("Overall Accuracy", "89.23%", "Reliable Generalization")
-    col_m2.metric("Precision (Weighted)", "92.87%", "Low False Positives")
-    col_m3.metric("Recall (Macro)", "88.10%", "Strong True Positive Capture")
-    col_m4.metric("F1-Score", "90.50%", "Balanced Performance")
+    active_report, active_cm, active_model_name = get_active_metrics(model_choice)
 
-    st.markdown("---")
-    
-    col_c1, col_c2 = st.columns(2)
-    
-    with col_c1:
-        st.markdown("#### 🔢 Confusion Matrix Table & Heatmap Chart")
-        cm_data = np.array([
-            [673, 112, 299],
-            [152, 556, 477],
-            [321, 158, 23316]
-        ])
-        labels = ["Negative", "Neutral", "Positive"]
-        cm_df = pd.DataFrame(cm_data, index=labels, columns=labels)
-        st.dataframe(cm_df, use_container_width=True)
-        
-        # Graphical Heatmap Chart
-        fig_cm = px.imshow(
-            cm_df, text_auto=True, aspect="auto",
-            color_continuous_scale="YlOrBr", template="plotly_dark",
-            labels=dict(x="Predicted", y="Actual", color="Count")
-        )
-        fig_cm.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10))
-        st.plotly_chart(fig_cm, use_container_width=True)
-        
-        st.info("💡 **Reading Guide**: High concentration on the bottom-right diagonal confirms exceptional detection of positive course reviews.")
+    if not active_report:
+        st.error("No metrics file found for this engine.")
+    else:
+        # Top KPI Metrics for Quick Decision Making
+        col_m1, col_m2, col_m3, col_m4 = st.columns(4)
+        col_m1.metric("Overall Accuracy", f"{active_report['accuracy']*100:.2f}%")
+        col_m2.metric("Precision (Weighted)", f"{active_report['weighted avg']['precision']*100:.2f}%")
+        col_m3.metric("Recall (Macro)", f"{active_report['macro avg']['recall']*100:.2f}%")
+        col_m4.metric("F1-Score (Macro)", f"{active_report['macro avg']['f1-score']*100:.2f}%")
 
-    with col_c2:
-        st.markdown("#### 📊 Per-Class F1-Score Reliability")
-        perf_df = pd.DataFrame({
-            "Sentiment": ["Negative", "Neutral", "Positive"],
-            "F1-Score": [0.74, 0.68, 0.94]
-        })
-        fig_f1 = px.bar(
-            perf_df, x="Sentiment", y="F1-Score", color="F1-Score",
-            color_continuous_scale="Viridis", template="plotly_dark"
-        )
-        fig_f1.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10))
-        st.plotly_chart(fig_f1, use_container_width=True)
+        st.markdown("---")
+
+        col_c1, col_c2 = st.columns(2)
+
+        with col_c1:
+            st.markdown("#### 🔢 Confusion Matrix Table & Heatmap Chart")
+            labels = ["Negative", "Neutral", "Positive"]
+            cm_df = pd.DataFrame(np.array(active_cm), index=labels, columns=labels)
+            st.dataframe(cm_df, use_container_width=True)
+
+            fig_cm = px.imshow(
+                cm_df, text_auto=True, aspect="auto",
+                color_continuous_scale="YlOrBr", template="plotly_dark",
+                labels=dict(x="Predicted", y="Actual", color="Count")
+            )
+            fig_cm.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10))
+            st.plotly_chart(fig_cm, use_container_width=True)
+
+            st.info("💡 **Reading Guide**: High concentration on the diagonal (top-left to bottom-right) means correct predictions; off-diagonal cells are misclassifications.")
+
+        with col_c2:
+            st.markdown("#### 📊 Per-Class F1-Score Reliability")
+            perf_df = pd.DataFrame({
+                "Sentiment": ["Negative", "Neutral", "Positive"],
+                "F1-Score": [
+                    active_report["negative"]["f1-score"],
+                    active_report["neutral"]["f1-score"],
+                    active_report["positive"]["f1-score"],
+                ]
+            })
+            fig_f1 = px.bar(
+                perf_df, x="Sentiment", y="F1-Score", color="F1-Score",
+                color_continuous_scale="Viridis", template="plotly_dark", range_y=[0, 1]
+            )
+            fig_f1.update_layout(paper_bgcolor="#030712", plot_bgcolor="#030712", margin=dict(t=10, b=10, l=10, r=10))
+            st.plotly_chart(fig_f1, use_container_width=True)
 
     st.markdown("---")
     st.subheader("🎯 Executive Action & Decision Insights")
 
-    col_i1, col_i2 = st.columns(2)
+    if active_report:
+        col_i1, col_i2 = st.columns(2)
 
-    with col_i1:
-        st.markdown("""
-        <div class="insight-card">
-            <h4>🟢 Where Model Excels (High Confidence)</h4>
-            <p><b>Positive Class Reliability (F1: 0.94)</b>: The model demonstrates elite precision in identifying satisfied participants and successful course outcomes. Management can securely rely on positive trends for institutional marketing and accreditation reports.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        with col_i1:
+            best_class = max(["negative", "neutral", "positive"], key=lambda c: active_report[c]["f1-score"])
+            st.markdown(f"""
+            <div class="insight-card">
+                <h4>🟢 Where Model Excels (High Confidence)</h4>
+                <p><b>{best_class.capitalize()} Class Reliability (F1: {active_report[best_class]['f1-score']:.2f})</b>: This is the model's strongest class. Predictions here can be trusted with relatively high confidence.</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-    with col_i2:
-        st.markdown("""
-        <div class="action-card">
-            <h4>🔴 Areas Requiring Intervention (Action Required)</h4>
-            <p><b>Neutral/Negative Boundary Confusion</b>: Some neutral feedback gets misclassified as negative or vice versa. <b>Action Plan</b>: Faculty should manually review feedback flagged in the neutral/negative borderline to address student concerns instantly.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        with col_i2:
+            worst_class = min(["negative", "neutral", "positive"], key=lambda c: active_report[c]["f1-score"])
+            st.markdown(f"""
+            <div class="action-card">
+                <h4>🔴 Areas Requiring Intervention (Action Required)</h4>
+                <p><b>{worst_class.capitalize()} Class Weakness (F1: {active_report[worst_class]['f1-score']:.2f})</b>: This class is the model's weakest — predictions here should be manually reviewed by faculty rather than acted on directly.</p>
+            </div>
+            """, unsafe_allow_html=True)
 
 # ==========================================
 # MODE 3: ASPECT-BASED SENTIMENT ANALYSIS
