@@ -5,6 +5,5 @@ scikit-learn
 joblib
 plotly
 transformers
-torch==2.3.1 --index-url https://download.pytorch.org/whl/cpu
 accelerate
 safetensors
