@@ -1,11 +1,9 @@
-
-shap
 streamlit
 pandas
 numpy
 scikit-learn==1.6.1
 joblib
 plotly
-torch
-transformers
-shap
+torch==2.3.1
+transformers==4.44.2
+shap==0.45.0
